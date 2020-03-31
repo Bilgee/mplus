@@ -11,7 +11,7 @@ class TopicModelAPI(Resource):
     """
 
     def __init__(self, **kwargs):
-        super(TopicAPI, self).__init__()
+        super(TopicModelAPI, self).__init__()
         self.topic_model = kwargs['topic_model']
         self.data = {
             u"response": {

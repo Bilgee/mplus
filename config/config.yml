@@ -1,0 +1,15 @@
+ENV: DEV
+PROD:
+  LOG:
+    PATH: log/
+    NAME: rotated.log
+    LEVEL: 20 #only info level
+  HTTP_HOST: 0.0.0.0
+  HTTP_PORT: 5003
+DEV:
+  LOG:
+    PATH: log/
+    NAME: rotated.log
+    LEVEL: 10 # all level
+  HTTP_HOST: 0.0.0.0
+  HTTP_PORT: 5003

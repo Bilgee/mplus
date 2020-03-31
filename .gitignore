@@ -1,0 +1,6 @@
+.vscode/*
+*.log
+*.log.*
+*.pyc
+venv/*
+.ipynb_checkpoints

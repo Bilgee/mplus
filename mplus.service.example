@@ -1,0 +1,13 @@
+[Unit]
+Description=uWSGI instance to serve mplus 
+After=network.target
+
+[Service]
+User=deploy
+Group=www-data
+WorkingDirectory=/opt/sites/mplus
+Environment="PATH=/opt/sites/mplus/venv/bin"
+ExecStart=/opt/sites/mplus/venv/bin/uwsgi --ini wsgi.ini
+ExecStop=/opt/sites/mplus/venv/bin/uwsgi --stop /tmp/mplus.pid
+[Install]
+WantedBy=multi-user.target

@@ -1,3 +1,5 @@
 autopep8
 numpy
+Flask
+Flask-RESTful
 git+ssh://https://github.com/Bilgee/topicmodel.git

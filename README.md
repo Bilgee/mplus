@@ -2,7 +2,9 @@
 
 ## create apps directory
 
-ID scan /opt/sites дотор ажиллахаар тохиргооны файлууд маань бичигдсэн байгаа тул /var/www доор apps folder-г үүсгэнэ.
+Application нь /opt/sites дотор ажиллахаар тохиргооны файлууд маань бичигдсэн байгаа тул /var/www доор apps folder-г үүсгэнэ.
+
+Лог хийхэд зориулж /var/log/uwsgi director-г үүсгэнэ.
 
 ```
 cd /opt/sites

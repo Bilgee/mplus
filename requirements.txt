@@ -2,4 +2,5 @@ autopep8
 numpy
 Flask
 Flask-RESTful
+PyYAML
 git+ssh://https://github.com/Bilgee/topicmodel.git

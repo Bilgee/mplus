@@ -3,4 +3,4 @@ numpy
 Flask
 Flask-RESTful
 PyYAML
-git+ssh://https://github.com/Bilgee/topicmodel.git
+git+ssh://git@github.com/fleshuu/ner.git

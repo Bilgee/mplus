@@ -18,8 +18,5 @@ app = Flask(__name__)
 api = Api(app)
 topic_model_en = TopicModel('LDA_Model')
 
-topic_genre="Topics.json"
-Predicted_mag=topic_model_en.predict(clean_text,topic_genre)
-
 api.add_resource(TopicModelAPI, '/v1.0/topicmodel/en',
-                 resource_class_kwargs={'topic_model': topic_model})
+                 resource_class_kwargs={'topic_model': topic_model_en , 'clean_text': clean_text})

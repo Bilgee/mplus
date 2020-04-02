@@ -3,4 +3,5 @@ numpy
 Flask
 Flask-RESTful
 PyYAML
+gensim
 git+ssh://git@github.com/fleshuu/ner.git

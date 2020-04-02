@@ -13,12 +13,8 @@ class TopicModelAPI(Resource):
     def __init__(self, **kwargs):
         super(TopicModelAPI, self).__init__()
         self.topic_model = kwargs['topic_model']
-        self.data = {
-            u"response": {
-                u"code": 1,
-                u"text": {"message": "error occured"}
-            }
-        }
+        self.text = kwargs['clean_text']
+        self.data=self.topic_model.predict(self.text)
         self.parser = reqparse.RequestParser()
         self.parser.add_argument(
             'data', type=str, location='json', required=True)

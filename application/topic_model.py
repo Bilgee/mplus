@@ -12,7 +12,7 @@ class TopicModel:
         """
         self.model = gensim.models.LdaModel.load(model)
         
-    def predict(self, clean_text, topic_genre):
+    def predict(self, clean_text):
         dictionary = corpora.Dictionary(clean_text)
         bow_corpus = [dictionary.doc2bow(doc) for doc in clean_text]
         topic_predictions = self.model[bow_corpus]
@@ -20,7 +20,7 @@ class TopicModel:
                         for topic, wt in sorted(topic_predictions[i],
                                                 key=lambda row: -row[1]) [:2]]
                             for i in range(len(topic_predictions))]
-        with open(topic_genre) as json_file:
+        with open("Topics.json") as json_file:
             Topics_genre = json.load(json_file)
         Predicted=[]
         for doc in best_topics:

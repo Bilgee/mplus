@@ -2,6 +2,7 @@ import json
 from log import logger
 import gensim
 from gensim import corpora
+
 class TopicModel:
     def __init__(self, model):
         """init class object
@@ -20,7 +21,7 @@ class TopicModel:
                         for topic, wt in sorted(topic_predictions[i],
                                                 key=lambda row: -row[1]) [:2]]
                             for i in range(len(topic_predictions))]
-        with open("Topics.json") as json_file:
+        with open("application/Topics.json") as json_file:
             Topics_genre = json.load(json_file)
         Predicted=[]
         for doc in best_topics:

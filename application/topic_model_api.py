@@ -4,6 +4,7 @@ from flask_restful import reqparse
 from log import logger
 import numpy as np
 import time
+from wplusner import ner_words, tokens_by_page
 
 
 class TopicModelAPI(Resource):
@@ -20,15 +21,18 @@ class TopicModelAPI(Resource):
             'data', type=str, location='json', required=True)
 
     def get(self):
-        return 'OK'
+        return self.data
 
     def post(self):
         try:
             args = self.parser.parse_args()
             data = args["data"]
             if data is not None:
-                self.data['response']['code'] = 0
-                self.data['response']['text'] = data
+                print(data)
+                text = tokens_by_page(data)
+                self.data = self.topic_model.predict(self.text)
+#                 self.data['response']['code'] = 0
+#                 self.data['response']['text'] = data
             return self.data
         except:
             logger.exception('ERROR')

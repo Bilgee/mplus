@@ -19,9 +19,10 @@ class TopicModel:
         dictionary = corpora.Dictionary(clean_text)
         bow_corpus = [dictionary.doc2bow(doc) for doc in clean_text]
         topic_predictions = self.model[bow_corpus]
+        top_number = 2
         best_topics = [[(topic, round(wt, 3))
                         for topic, wt in sorted(topic_predictions[i],
-                                                key=lambda row: -row[1]) [:2]]
+                                                key=lambda row: -row[1]) [:top_number]]
                             for i in range(len(topic_predictions))]
         Predicted=[]
         cnt=0

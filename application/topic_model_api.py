@@ -14,6 +14,12 @@ class TopicModelAPI(Resource):
     def __init__(self, **kwargs):
         super(TopicModelAPI, self).__init__()
         self.topic_model = kwargs['topic_model']
+        self.data = {
+            u"response": {
+                u"code": 1,
+                u"text": {"message": "error occured"}
+            }
+        }
         # self.data=self.topic_model.predict(self.text,self.ner)
         self.parser = reqparse.RequestParser()
         self.parser.add_argument(
@@ -26,11 +32,11 @@ class TopicModelAPI(Resource):
         try:
             args = self.parser.parse_args()
             data = args["data"]
-            print(data, type(data))
-            # if data is not None:
-                # self.data['response']['code'] = 0
-                # self.data['response']['text'] = ner_words(data)
-            return self.topic_model.predict(tokens_by_page(data) , ner_words(data))
+            # print(data, type(data))
+            if data is not None:
+                self.data['response']['code'] = 0
+                self.data['response']['text'] = self.topic_model.predict(tokens_by_page(data) , ner_words(data))
+            return self.data
         except:
             logger.exception('ERROR')
             return data

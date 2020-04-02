@@ -14,15 +14,23 @@ class TopicModelAPI(Resource):
     def __init__(self, **kwargs):
         super(TopicModelAPI, self).__init__()
         self.topic_model = kwargs['topic_model']
-        self.text = kwargs['clean_text']
-        self.ner = kwargs['ner']
-        self.data=self.topic_model.predict(self.text,self.ner)
+        # self.data=self.topic_model.predict(self.text,self.ner)
         self.parser = reqparse.RequestParser()
         self.parser.add_argument(
-            'data', type=str, location='json', required=True)
+            'data', type=list, location='json', required=True)
 
     def get(self):
-        return self.data
+        return "Ok"
 
     def post(self):
-        return self.data
+        try:
+            args = self.parser.parse_args()
+            data = args["data"]
+            print(data, type(data))
+            # if data is not None:
+                # self.data['response']['code'] = 0
+                # self.data['response']['text'] = ner_words(data)
+            return self.topic_model.predict(tokens_by_page(data) , ner_words(data))
+        except:
+            logger.exception('ERROR')
+            return data

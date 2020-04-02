@@ -4,7 +4,7 @@ from flask_restful import reqparse
 from log import logger
 import numpy as np
 import time
-from wplusner import ner_words, tokens_by_page
+from wplusner import Ner
 
 
 class TopicModelAPI(Resource):
@@ -14,6 +14,9 @@ class TopicModelAPI(Resource):
     def __init__(self, **kwargs):
         super(TopicModelAPI, self).__init__()
         self.topic_model = kwargs['topic_model']
+        self.ner_model = kwargs['ner_model']
+        self.ner_words = self.ner_model.ner_words
+        self.tokens_by_page = self.ner_model.tokens_by_page
         self.data = {
             u"response": {
                 u"code": 1,
@@ -35,7 +38,8 @@ class TopicModelAPI(Resource):
             # print(data, type(data))
             if data is not None:
                 self.data['response']['code'] = 0
-                self.data['response']['text'] = self.topic_model.predict(tokens_by_page(data) , ner_words(data))
+                tokens, ner = self.ner_model.get_tokens_and_ner(data)
+                self.data['response']['text'] = self.topic_model.predict(tokens , ner)
             return self.data
         except:
             logger.exception('ERROR')

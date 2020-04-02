@@ -4,6 +4,6 @@ Flask
 Flask-RESTful
 PyYAML
 gensim
-deeppavlov
-spacy
+# deeppavlov
+# spacy
 git+ssh://git@github.com/fleshuu/ner.git

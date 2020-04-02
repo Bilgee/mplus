@@ -61,5 +61,6 @@ orolt =[{
         "text": ["UPCOMING", "Teks oleh Desy RufaidaFoto: Dok. CASA Indonesia", "T ahun berganti tahun, beragam pameran desain turut hadir meramaikan ajang ekspresi seni di Indonesia. Telah melewati satu dekade, di tahun ke-11 ini Casa Indonesia 2020 kembali menjadi sebuah ekshibisi yang mencuri perhatian berbagai kalangan, tidak hanya untuk para kreator desain tetapi juga para penikmat desain.", ""]
     }]
 clean_text=tokens_by_page(orolt)
+ner=ner_words(orolt)
 api.add_resource(TopicModelAPI, '/v1.0/topicmodel/en',
-                 resource_class_kwargs={'topic_model': topic_model_en})
+                 resource_class_kwargs={'topic_model': topic_model_en,'clean_text': clean_text,'ner': ner})

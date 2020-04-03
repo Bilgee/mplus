@@ -29,7 +29,7 @@ class TopicModelAPI(Resource):
             'data', type=list, location='json', required=True)
 
     def get(self):
-        return "Ok"
+        return "Send json with POST request to get it analyzed"
 
     def post(self):
         try:
@@ -43,4 +43,4 @@ class TopicModelAPI(Resource):
             return self.data
         except:
             logger.exception('ERROR')
-            return data
+            return self.data

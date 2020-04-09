@@ -14,7 +14,6 @@ class TopicModel:
         self.model = gensim.models.LdaModel.load(model)
         with open("application/Topics.json") as json_file:
             self.Topics_genre = json.load(json_file)
-        
     def predict(self, clean_text, ner):
         dictionary = corpora.Dictionary(clean_text)
         bow_corpus = [dictionary.doc2bow(doc) for doc in clean_text]
@@ -26,7 +25,8 @@ class TopicModel:
                             for i in range(len(topic_predictions))]
         Predicted=[]
         # tf_idf
-        corpus_tfidf = tf_idf(bow_corpus)
+        tf_idf = gensim.models.TfidfModel(bow_corpus)
+        corpus_tfidf = tf_idf[bow_corpus]
         top_8_or_so_words = []
         for doc in corpus_tfidf:
             doc.sort(key = lambda x: x[1],reverse=True)

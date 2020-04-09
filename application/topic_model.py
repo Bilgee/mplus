@@ -57,6 +57,8 @@ class TopicModel:
             temp2["Named Entity"]=[]
             for word in ner[cnt]:
                 temp={}
+                if word == '':
+                    continue
                 temp["Text"]=word[0]
                 temp["Label"]=word[1]
                 temp2["Named Entity"].append(temp)

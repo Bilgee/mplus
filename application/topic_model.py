@@ -25,6 +25,19 @@ class TopicModel:
                                                 key=lambda row: -row[1]) [:top_number]]
                             for i in range(len(topic_predictions))]
         Predicted=[]
+        # tf_idf
+        corpus_tfidf = tf_idf(bow_corpus)
+        top_8_or_so_words = []
+        for doc in corpus_tfidf:
+            doc.sort(key = lambda x: x[1],reverse=True)
+            tmp = []
+            cnt = 0
+            for word in doc:
+                tmp+=[dictionary[word[0]]]
+                cnt+=1
+                if cnt == 8:
+                    break
+            top_8_or_so_words+=[tmp]
         cnt=0
         for doc in best_topics:
             temp=[]
@@ -47,6 +60,7 @@ class TopicModel:
                 temp["Text"]=word[0]
                 temp["Label"]=word[1]
                 temp2["Named Entity"].append(temp)
+            temp2["Keywords"]=top_8_or_so_words[cnt]
             cnt+=1
             Predicted.append(temp2)
         return Predicted

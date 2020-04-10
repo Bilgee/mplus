@@ -38,8 +38,8 @@ class TopicModelAPI(Resource):
             # print(data, type(data))
             if data is not None:
                 self.data['response']['code'] = 0
-                tokens, ner = self.ner_model.get_tokens_and_ner(data)
-                self.data['response']['text'] = self.topic_model.predict(tokens , ner)
+                tokens, ner, page_numbers = self.ner_model.get_tokens_and_ner(data)
+                self.data['response']['text'] = self.topic_model.predict(tokens, ner, page_numbers)
             return self.data
         except:
             logger.exception('ERROR')

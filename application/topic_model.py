@@ -28,7 +28,7 @@ class TopicModel:
                 break
             a={}
             a["Text"]=word[0]
-            a["Score"]=word[1]
+            a["Score"]=round(word[1],3)
             temp.append(a)
             j+=1
         return temp
@@ -44,7 +44,7 @@ class TopicModel:
         t={} # topic buriin niit score
         for word in page:
             w=dictionary[word[0]]
-            w=wordnet_lemmatizer(w)
+            w=wordnet_lemmatizer.lemmatize(w)
             try:
                 temp2=Tdictionary[w]
             except KeyError:

@@ -15,7 +15,17 @@ class TopicModel:
             self.model = json.load(json_file)
         with open("application/Tdictionary.txt") as json_file:
             self.Tdictionary = json.load(json_file)
-       
+    
+    def Topics_Words(self,index,number,Model_topics):
+        temp=[]
+        j=0
+        for word in Model_topics['Topics'][index]['Words']:
+            if j==number:
+                break
+            temp.append(word[0])
+            j+=1
+        return temp
+    
     def Topics_temp(self,category,score,total):
         temp={}
         temp['Category']=category

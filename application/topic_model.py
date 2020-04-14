@@ -123,7 +123,7 @@ class TopicModel:
                 if t[q][1]>0.05:
                     tlist.append([t[q][0],q,temp2])
                 else:
-                    total-=t[q][1]
+                    total-=t[q][0]
             tlist.sort()
             if total==0 or len(tlist)==0:
                 temp2={}
@@ -136,7 +136,6 @@ class TopicModel:
                 temp['Topics'].append(temp2)
                 Predicted.append(temp)
                 continue
-            clist=[]
             if len(tlist)==1 or len(tlist)==2:
                 temp=self.Max_score(temp,tlist,self.model,total)
                 Predicted.append(temp)

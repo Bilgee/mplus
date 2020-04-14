@@ -22,7 +22,10 @@ class TopicModel:
         for word in Model_topics['Topics'][index]['Words']:
             if j==number:
                 break
-            temp.append(word[0])
+            a={}
+            a["Text"]=word[0]
+            a["Score"]=word[1]
+            temp.append(a)
             j+=1
         return temp
     
@@ -88,7 +91,10 @@ class TopicModel:
             if j==10:
                 break
             j+=1
-            temp['Topics'][0]['Words'].append(ug[(-1)*i-2][1])
+            a={}
+            a["Text"]=ug[(-1)*i-2][1]
+            a["Score"]=ug[(-1)*i-2][0]
+            temp['Topics'][0]['Words'].append(a)
         temp['Topics'].append(self.Topics_temp(tlist[-1][2],tlist[-1][0],total))
         temp['Topics'][1]['Words']=self.Topics_Words(tlist[-1][1],10,Model_topics)
         return temp
@@ -103,7 +109,10 @@ class TopicModel:
                 temp2={}
                 temp2['Category']='Unknown'
                 temp2['Score']=0
-                temp2['Words']=['']
+                a={}
+                a["Text"]=""
+                a["Score"]=0
+                temp2['Words']=[a]
                 temp['Topics'].append(temp2)
                 Predicted.append(temp)
                 continue
@@ -112,7 +121,6 @@ class TopicModel:
                 temp2=self.model['Topics'][q]['Category'] # q ni topiciin index
                 tlist.append([t[q],q,temp2])
             tlist.sort()
-            clist=[]
             if len(tlist)==1 or len(tlist)==2:
                 temp=self.Max_score(temp,tlist,self.model,total)
                 Predicted.append(temp)

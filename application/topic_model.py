@@ -73,13 +73,13 @@ class TopicModel:
             temp['Topics'][1]['Words']=self.Topics_Words(tlist[-2][1],10,Model_topics)
             
             temp['Topics'].append(self.Topics_temp(tlist[-3][2],tlist[-3][0],total))
-            temp['Topics'][1]['Words']=self.Topics_Words(tlist[-3][1],10,Model_topics)
+            temp['Topics'][2]['Words']=self.Topics_Words(tlist[-3][1],10,Model_topics)
             
             temp['Topics'].append(self.Topics_temp(tlist[-4][2],tlist[-4][0],total))
-            temp['Topics'][1]['Words']=self.Topics_Words(tlist[-4][1],10,Model_topics)
+            temp['Topics'][3]['Words']=self.Topics_Words(tlist[-4][1],10,Model_topics)
             
             temp['Topics'].append(self.Topics_temp(tlist[-5][2],tlist[-5][0],total))
-            temp['Topics'][1]['Words']=self.Topics_Words(tlist[-5][1],10,Model_topics)
+            temp['Topics'][4]['Words']=self.Topics_Words(tlist[-5][1],10,Model_topics)
         except:
             return temp
         return temp

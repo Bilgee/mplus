@@ -50,7 +50,11 @@ class TopicModel:
             except KeyError:
                 continue
             for q in temp2:
-                i=q['Score']*(word[1]*(1.1-word[1]*0.1))
+                j=1
+                i=0
+                for p in range(word[1]):
+                    i+=q['Score']*j
+                    j*=0.9
                 total+=i
                 try:
                     t[q['Index']][0]+=i # t[0]+=0.05*2 -- 0 ni topiciin index, 0.05 ni ugiin onoo, 2 ni paged orson tuhain ugnii too 
@@ -118,6 +122,8 @@ class TopicModel:
                 temp2=self.model['Topics'][q]['Category'] # q ni topiciin index
                 if t[q][1]>0.05:
                     tlist.append([t[q][0],q,temp2])
+                else:
+                    total-=t[q][1]
             tlist.sort()
             if total==0 or len(tlist)==0:
                 temp2={}

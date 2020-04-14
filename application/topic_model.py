@@ -56,7 +56,7 @@ class TopicModel:
                     i+=q['Score']*j
                     j*=0.9
                 total+=i
-                try:
+                try:            
                     t[q['Index']][0]+=i # t[0]+=0.05*2 -- 0 ni topiciin index, 0.05 ni ugiin onoo, 2 ni paged orson tuhain ugnii too 
                     t[q['Index']][1]+=q['Score']
                 except KeyError:
@@ -71,6 +71,15 @@ class TopicModel:
         try:
             temp['Topics'].append(self.Topics_temp(tlist[-2][2],tlist[-2][0],total))
             temp['Topics'][1]['Words']=self.Topics_Words(tlist[-2][1],10,Model_topics)
+            
+            temp['Topics'].append(self.Topics_temp(tlist[-3][2],tlist[-3][0],total))
+            temp['Topics'][1]['Words']=self.Topics_Words(tlist[-3][1],10,Model_topics)
+            
+            temp['Topics'].append(self.Topics_temp(tlist[-4][2],tlist[-4][0],total))
+            temp['Topics'][1]['Words']=self.Topics_Words(tlist[-4][1],10,Model_topics)
+            
+            temp['Topics'].append(self.Topics_temp(tlist[-5][2],tlist[-5][0],total))
+            temp['Topics'][1]['Words']=self.Topics_Words(tlist[-5][1],10,Model_topics)
         except:
             return temp
         return temp
@@ -136,7 +145,7 @@ class TopicModel:
                 temp['Topics'].append(temp2)
                 Predicted.append(temp)
                 continue
-            if len(tlist)==1 or len(tlist)==2:
+            if len(tlist)==1 or len(tlist)==2 or 1:
                 temp=self.Max_score(temp,tlist,self.model,total)
                 Predicted.append(temp)
                 continue

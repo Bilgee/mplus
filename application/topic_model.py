@@ -28,7 +28,7 @@ class TopicModel:
                 break
             a={}
             a["Text"]=word[0]
-            a["Score"]=round(word[1],3)
+            a["Score"]=round(word[1],4)
             temp.append(a)
             j+=1
         return temp
@@ -50,12 +50,15 @@ class TopicModel:
             except KeyError:
                 continue
             for q in temp2:
-                i=q['Score']*word[1]
+                i=q['Score']*(word[1]*(1.1-word[1]*0.1))
                 total+=i
                 try:
-                    t[q['Index']]+=i # t[0]+=0.05*2 -- 0 ni topiciin index, 0.05 ni ugiin onoo, 2 ni paged orson tuhain ugnii too 
+                    t[q['Index']][0]+=i # t[0]+=0.05*2 -- 0 ni topiciin index, 0.05 ni ugiin onoo, 2 ni paged orson tuhain ugnii too 
+                    t[q['Index']][1]+=q['Score']
                 except KeyError:
-                    t[q['Index']]=i
+                    t[q['Index']]=[]
+                    t[q['Index']].append(i)
+                    t[q['Index']].append(0)
         return t,total
     
     def Max_score(self,temp,tlist,Model_topics,total):
@@ -98,7 +101,7 @@ class TopicModel:
             j+=1
             a={}
             a["Text"]=ug[(-1)*i-2][1]
-            a["Score"]=ug[(-1)*i-2][0]
+            a["Score"]=round(ug[(-1)*i-2][0],4)
             temp['Topics'][0]['Words'].append(a)
         temp['Topics'].append(self.Topics_temp(tlist[-1][2],tlist[-1][0],total))
         temp['Topics'][1]['Words']=self.Topics_Words(tlist[-1][1],10,Model_topics)
@@ -110,7 +113,13 @@ class TopicModel:
             temp={}
             temp['Topics']=[]
             t,total=self.Topic_score(page,self.Tdictionary,dictionary)
-            if total==0:
+            tlist=[]
+            for q in t:
+                temp2=self.model['Topics'][q]['Category'] # q ni topiciin index
+                if t[q][1]>0.05:
+                    tlist.append([t[q][0],q,temp2])
+            tlist.sort()
+            if total==0 or len(tlist)==0:
                 temp2={}
                 temp2['Category']='Unknown'
                 temp2['Score']=0
@@ -121,11 +130,7 @@ class TopicModel:
                 temp['Topics'].append(temp2)
                 Predicted.append(temp)
                 continue
-            tlist=[]
-            for q in t:
-                temp2=self.model['Topics'][q]['Category'] # q ni topiciin index
-                tlist.append([t[q],q,temp2])
-            tlist.sort()
+            clist=[]
             if len(tlist)==1 or len(tlist)==2:
                 temp=self.Max_score(temp,tlist,self.model,total)
                 Predicted.append(temp)

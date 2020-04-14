@@ -2,6 +2,10 @@ import json
 from log import logger
 import gensim
 from gensim import corpora
+import nltk
+nltk.download('wordnet')
+from nltk.stem import WordNetLemmatizer
+wordnet_lemmatizer = WordNetLemmatizer()
 
 class TopicModel:
     def __init__(self, model):
@@ -40,6 +44,7 @@ class TopicModel:
         t={} # topic buriin niit score
         for word in page:
             w=dictionary[word[0]]
+            w=wordnet_lemmatizer(w)
             try:
                 temp2=Tdictionary[w]
             except KeyError:

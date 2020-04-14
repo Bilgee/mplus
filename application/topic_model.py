@@ -16,13 +16,13 @@ class TopicModel:
         with open("application/Tdictionary.txt") as json_file:
             self.Tdictionary = json.load(json_file)
        
-    def Topics_temp(category,score,total):
+    def Topics_temp(self,category,score,total):
         temp={}
         temp['Category']=category
         temp['Score']=round((score/total),4)
         return temp
     
-    def Topic_score(page,Tdictionary):
+    def Topic_score(self,page,Tdictionary,dictionary):
         total=0
         t={} # topic buriin niit score
         for word in page:
@@ -40,21 +40,21 @@ class TopicModel:
                     t[q['Index']]=i
         return t,total
     
-    def Max_score(temp,tlist,Model_topics,total):
-        temp['Topics'].append(Topics_temp(tlist[-1][2],tlist[-1][0],total))
-        temp['Topics'][0]['Words']=Topics_Words(tlist[-1][1],10,Model_topics)
+    def Max_score(self,temp,tlist,Model_topics,total):
+        temp['Topics'].append(self.Topics_temp(tlist[-1][2],tlist[-1][0],total))
+        temp['Topics'][0]['Words']=self.Topics_Words(tlist[-1][1],10,Model_topics)
         try:
-            temp['Topics'].append(Topics_temp(tlist[-2][2],tlist[-2][0],total))
-            temp['Topics'][1]['Words']=Topics_Words(tlist[-2][1],10,Model_topics)
+            temp['Topics'].append(self.Topics_temp(tlist[-2][2],tlist[-2][0],total))
+            temp['Topics'][1]['Words']=self.Topics_Words(tlist[-2][1],10,Model_topics)
         except:
             return temp
         return temp
     
-    def Max_category(temp,tlist,Model_topics,total):
+    def Max_category(self,temp,tlist,Model_topics,total):
         if not tlist[-2][2]==tlist[-3][2] or tlist[-3][0]+tlist[-2][0]<tlist[-1][0]:
-            temp=Max_score(temp,tlist,Model_topics,total)
+            temp=self.Max_score(temp,tlist,Model_topics,total)
             return temp
-        temp['Topics'].append(Topics_temp(tlist[-2][2],tlist[-3][0]+tlist[-2][0],total))
+        temp['Topics'].append(self.Topics_temp(tlist[-2][2],tlist[-3][0]+tlist[-2][0],total))
         temp['Topics'][0]['Words']=[]
         j=0
         ug=[]
@@ -79,16 +79,16 @@ class TopicModel:
                 break
             j+=1
             temp['Topics'][0]['Words'].append(ug[(-1)*i-2][1])
-        temp['Topics'].append(Topics_temp(tlist[-1][2],tlist[-1][0],total))
-        temp['Topics'][1]['Words']=Topics_Words(tlist[-1][1],10,Model_topics)
+        temp['Topics'].append(self.Topics_temp(tlist[-1][2],tlist[-1][0],total))
+        temp['Topics'][1]['Words']=self.Topics_Words(tlist[-1][1],10,Model_topics)
         return temp
     
-    def topic_predict(self,bow_corpus):
+    def topic_predict(self,bow_corpus,dictionary):
         Predicted=[] # Huudas bureer hamaaragdah topiciin huwiig oruulna
         for page in bow_corpus:
             temp={}
             temp['Topics']=[]
-            t,total=Topic_score(page,self.Tdictionary)
+            t,total=self.Topic_score(page,self.Tdictionary,dictionary)
             if total==0:
                 temp2={}
                 temp2['Category']='Unknown'
@@ -104,15 +104,15 @@ class TopicModel:
             tlist.sort()
             clist=[]
             if len(tlist)==1 or len(tlist)==2:
-                temp=Max_score(temp,tlist,self.model,total)
+                temp=self.Max_score(temp,tlist,self.model,total)
                 Predicted.append(temp)
                 continue
             elif tlist[-1][0]*0.8>tlist[-2][0] or tlist[-1][2]==tlist[-2][2]:
-                temp=Max_score(temp,tlist,self.model,total)
+                temp=self.Max_score(temp,tlist,self.model,total)
                 Predicted.append(temp)
                 continue
             else:
-                temp=Max_category(temp,tlist,self.model,total)
+                temp=self.Max_category(temp,tlist,self.model,total)
                 Predicted.append(temp)
                 continue
         return Predicted
@@ -120,7 +120,7 @@ class TopicModel:
     def predict(self, clean_text, ner, page_numbers):
         dictionary = corpora.Dictionary(clean_text)
         bow_corpus = [dictionary.doc2bow(doc) for doc in clean_text]
-        topic_predictions = topic_predict(bow_corpus)
+        topic_predictions = self.topic_predict(bow_corpus,dictionary)
         Predicted=[]
         # tf_idf
         tf_idf = gensim.models.TfidfModel(bow_corpus)

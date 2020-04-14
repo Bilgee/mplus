@@ -8,21 +8,119 @@ class TopicModel:
         """init class object
 
         Arguments:
-            model_path {string} -- [a path to read a trained model]
-            features {list} -- [list of features as a string]
+            model -- [Topics]
+            Tdictionary  -- [Topic words dictionary] 
         """
-        self.model = gensim.models.LdaModel.load(model)
-        with open("application/Topics.json") as json_file:
-            self.Topics_genre = json.load(json_file)
+        with open("application/Newtopic.txt") as json_file:
+            self.model = json.load(json_file)
+        with open("application/Tdictionary.txt") as json_file:
+            self.Tdictionary = json.load(json_file)
+       
+    def Topics_temp(category,score,total):
+        temp={}
+        temp['Category']=category
+        temp['Score']=round((score/total),4)
+        return temp
+    
+    def Topic_score(page,Tdictionary):
+        total=0
+        t={} # topic buriin niit score
+        for word in page:
+            w=dictionary[word[0]]
+            try:
+                temp2=Tdictionary[w]
+            except KeyError:
+                continue
+            for q in temp2:
+                i=q['Score']*word[1]
+                total+=i
+                try:
+                    t[q['Index']]+=i # t[0]+=0.05*2 -- 0 ni topiciin index, 0.05 ni ugiin onoo, 2 ni paged orson tuhain ugnii too 
+                except KeyError:
+                    t[q['Index']]=i
+        return t,total
+    
+    def Max_score(temp,tlist,Model_topics,total):
+        temp['Topics'].append(Topics_temp(tlist[-1][2],tlist[-1][0],total))
+        temp['Topics'][0]['Words']=Topics_Words(tlist[-1][1],10,Model_topics)
+        try:
+            temp['Topics'].append(Topics_temp(tlist[-2][2],tlist[-2][0],total))
+            temp['Topics'][1]['Words']=Topics_Words(tlist[-2][1],10,Model_topics)
+        except:
+            return temp
+        return temp
+    
+    def Max_category(temp,tlist,Model_topics,total):
+        if not tlist[-2][2]==tlist[-3][2] or tlist[-3][0]+tlist[-2][0]<tlist[-1][0]:
+            temp=Max_score(temp,tlist,Model_topics,total)
+            return temp
+        temp['Topics'].append(Topics_temp(tlist[-2][2],tlist[-3][0]+tlist[-2][0],total))
+        temp['Topics'][0]['Words']=[]
+        j=0
+        ug=[]
+        for word,score in Model_topics['Topics'][tlist[-2][1]]['Words']:
+            if j==10:
+                break
+            ug.append([score,word])
+            j+=1
+        j=0
+        for word,score in Model_topics['Topics'][tlist[-3][1]]['Words']:
+            if j==10:
+                break
+            ug.append([score,word])
+            j+=1
+        ug.sort()
+        temp['Topics'][0]['Words'].append(ug[-1][1])
+        j=0
+        for i in range(len(ug)-1):
+            if ug[(-1)*i-2][1]==ug[(-1)*i-1][1]:
+                continue
+            if j==10:
+                break
+            j+=1
+            temp['Topics'][0]['Words'].append(ug[(-1)*i-2][1])
+        temp['Topics'].append(Topics_temp(tlist[-1][2],tlist[-1][0],total))
+        temp['Topics'][1]['Words']=Topics_Words(tlist[-1][1],10,Model_topics)
+        return temp
+    
+    def topic_predict(self,bow_corpus):
+        Predicted=[] # Huudas bureer hamaaragdah topiciin huwiig oruulna
+        for page in bow_corpus:
+            temp={}
+            temp['Topics']=[]
+            t,total=Topic_score(page,self.Tdictionary)
+            if total==0:
+                temp2={}
+                temp2['Category']='Unknown'
+                temp2['Score']=0
+                temp2['Words']=['']
+                temp['Topics'].append(temp2)
+                Predicted.append(temp)
+                continue
+            tlist=[]
+            for q in t:
+                temp2=self.model['Topics'][q]['Category'] # q ni topiciin index
+                tlist.append([t[q],q,temp2])
+            tlist.sort()
+            clist=[]
+            if len(tlist)==1 or len(tlist)==2:
+                temp=Max_score(temp,tlist,self.model,total)
+                Predicted.append(temp)
+                continue
+            elif tlist[-1][0]*0.8>tlist[-2][0] or tlist[-1][2]==tlist[-2][2]:
+                temp=Max_score(temp,tlist,self.model,total)
+                Predicted.append(temp)
+                continue
+            else:
+                temp=Max_category(temp,tlist,self.model,total)
+                Predicted.append(temp)
+                continue
+        return Predicted
+    
     def predict(self, clean_text, ner, page_numbers):
         dictionary = corpora.Dictionary(clean_text)
         bow_corpus = [dictionary.doc2bow(doc) for doc in clean_text]
-        topic_predictions = self.model[bow_corpus]
-        top_number = 2
-        best_topics = [[(topic, round(wt, 3))
-                        for topic, wt in sorted(topic_predictions[i],
-                                                key=lambda row: -row[1]) [:top_number]]
-                            for i in range(len(topic_predictions))]
+        topic_predictions = topic_predict(bow_corpus)
         Predicted=[]
         # tf_idf
         tf_idf = gensim.models.TfidfModel(bow_corpus)
@@ -39,21 +137,9 @@ class TopicModel:
                     break
             top_8_or_so_words+=[tmp]
         cnt=0
-        for doc in best_topics:
-            temp=[]
-            for top in doc:
-                page={}
-                page["Score"]=top[1]
-                page["Category"]=self.Topics_genre['Topics'][top[0]]['Category']
-                page["Words"]=[]
-                for word in self.Topics_genre['Topics'][top[0]]['Topic']:
-                    temp2={}
-                    temp2["Text"]=word[0]
-                    temp2["Score"]=round(word[1], 3)
-                    page["Words"].append(temp2)
-                temp.append(page)
+        for doc in topic_predictions:
             temp2={}
-            temp2["Topic"]=temp
+            temp2["Topic"]=doc['Topics']
             temp2["Named Entity"]=[]
             for word in ner[cnt]:
                 temp={}

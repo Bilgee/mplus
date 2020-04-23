@@ -74,7 +74,8 @@ class TopicModel:
                         s[q['Index']]=[]
                         s[q['Index']].append(i)
                         s[q['Index']].append(q['Score'])
-            for wo in s:           
+            for wo in s:
+                total+=s[wo][0]
                 try:            
                     t[wo][0]+=s[wo][0] 
                     t[wo][1]+=s[wo][1]

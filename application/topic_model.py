@@ -3,6 +3,8 @@ from log import logger
 import gensim
 from gensim import corpora
 import nltk
+from nltk.corpus import wordnet
+import fnmatch
 nltk.download('wordnet')
 from nltk.stem import WordNetLemmatizer
 wordnet_lemmatizer = WordNetLemmatizer()
@@ -45,24 +47,31 @@ class TopicModel:
         for word in page:
             w=dictionary[word[0]]
             w=wordnet_lemmatizer.lemmatize(w)
-            try:
-                temp2=Tdictionary[w]
-            except KeyError:
-                continue
-            for q in temp2:
-                j=1
-                i=0
-                for p in range(word[1]):
-                    i+=q['Score']*j
-                    j*=0.9
-                total+=i
-                try:            
-                    t[q['Index']][0]+=i # t[0]+=0.05*2 -- 0 ni topiciin index, 0.05 ni ugiin onoo, 2 ni paged orson tuhain ugnii too 
-                    t[q['Index']][1]+=q['Score']
+            syns = wordnet.synsets(w)
+            dd=set()
+            for syn in syns:
+                if fnmatch.fnmatch(syn.name(), "*.n.*"):
+                    for s in syn.lemmas():
+                        dd.add(s.name())
+            for ug in dd:
+                try:
+                    temp2=Tdictionary[ug]
                 except KeyError:
-                    t[q['Index']]=[]
-                    t[q['Index']].append(i)
-                    t[q['Index']].append(0)
+                    continue
+                for q in temp2:
+                    j=1
+                    i=0
+                    for p in range(word[1]):
+                        i+=q['Score']*j
+                        j*=0.9
+                    total+=i
+                    try:            
+                        t[q['Index']][0]+=i # t[0]+=0.05*2 -- 0 ni topiciin index, 0.05 ni ugiin onoo, 2 ni paged orson tuhain ugnii too 
+                        t[q['Index']][1]+=q['Score']
+                    except KeyError:
+                        t[q['Index']]=[]
+                        t[q['Index']].append(i)
+                        t[q['Index']].append(0)
         return t,total
     
     def Max_score(self,temp,tlist,Model_topics,total):

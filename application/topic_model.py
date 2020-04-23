@@ -52,7 +52,9 @@ class TopicModel:
             for syn in syns:
                 if fnmatch.fnmatch(syn.name(), "*.n.*"):
                     for s in syn.lemmas():
-                        dd.add(s.name())
+                        b = wordnet.synsets(s.name())[0]
+                        if b.wup_similarity(wordnet.synsets(w)[0])>0.8:
+                            dd.add(s.name())
             s={}
             for ug in dd:
                 try:

@@ -1,5 +1,5 @@
 autopep8
-numpy
+numpy == 1.18.0
 Flask
 Flask-RESTful
 PyYAML

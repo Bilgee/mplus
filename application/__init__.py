@@ -18,7 +18,6 @@ app = Flask(__name__)
 api = Api(app)
 topic_model_en = TopicModel('application/LDA_Model')
 ner_model = Ner()
-ner_model.load_model()
 
 api.add_resource(TopicModelAPI, '/v1.0/topicmodel/en',
                  resource_class_kwargs={'topic_model': topic_model_en, 'ner_model': ner_model})

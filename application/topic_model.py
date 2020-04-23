@@ -53,6 +53,7 @@ class TopicModel:
                 if fnmatch.fnmatch(syn.name(), "*.n.*"):
                     for s in syn.lemmas():
                         dd.add(s.name())
+            s={}
             for ug in dd:
                 try:
                     temp2=Tdictionary[ug]
@@ -62,16 +63,25 @@ class TopicModel:
                     j=1
                     i=0
                     for p in range(word[1]):
-                        i+=q['Score']*j
+                        i+=q['Score']*j 
                         j*=0.9
-                    total+=i
-                    try:            
-                        t[q['Index']][0]+=i # t[0]+=0.05*2 -- 0 ni topiciin index, 0.05 ni ugiin onoo, 2 ni paged orson tuhain ugnii too 
-                        t[q['Index']][1]+=q['Score']
+                    try:
+                        if i>s[q['Index']][0]:
+                            s[q['Index']][0]=i
+                        if q['Score']>s[q['Index']][1]:
+                            s[q['Index']][1]=q['Score']
                     except KeyError:
-                        t[q['Index']]=[]
-                        t[q['Index']].append(i)
-                        t[q['Index']].append(0)
+                        s[q['Index']]=[]
+                        s[q['Index']].append(i)
+                        s[q['Index']].append(q['Score'])
+            for wo in s:           
+                try:            
+                    t[wo][0]+=s[wo][0] 
+                    t[wo][1]+=s[wo][1]
+                except KeyError:
+                    t[wo]=[]
+                    t[wo].append(s[wo][0])
+                    t[wo].append(s[wo][1])
         return t,total
     
     def Max_score(self,temp,tlist,Model_topics,total):

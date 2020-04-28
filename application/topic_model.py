@@ -10,7 +10,7 @@ from nltk.stem import WordNetLemmatizer
 wordnet_lemmatizer = WordNetLemmatizer()
 
 class TopicModel:
-    def __init__(self, model):
+    def __init__(self):
         """init class object
 
         Arguments:
@@ -49,12 +49,13 @@ class TopicModel:
             w=wordnet_lemmatizer.lemmatize(w)
             syns = wordnet.synsets(w)
             dd=set()
-            for syn in syns:
+            try:
+                syn=syns[0]
                 if fnmatch.fnmatch(syn.name(), "*.n.*"):
                     for s in syn.lemmas():
-                        b = wordnet.synsets(s.name())[0]
-                        if b.wup_similarity(wordnet.synsets(w)[0])>0.8:
-                            dd.add(s.name())
+                        dd.add(s.name())
+            except:
+                dd.add(w)
             s={}
             for ug in dd:
                 try:
@@ -90,9 +91,11 @@ class TopicModel:
     def Max_score(self,temp,tlist,Model_topics,total):
         temp['Topics'].append(self.Topics_temp(tlist[-1][2],tlist[-1][0],total))
         temp['Topics'][0]['Words']=self.Topics_Words(tlist[-1][1],10,Model_topics)
+        temp['Topics'][0]['Index']=tlist[-1][1]
         try:
             temp['Topics'].append(self.Topics_temp(tlist[-2][2],tlist[-2][0],total))
             temp['Topics'][1]['Words']=self.Topics_Words(tlist[-2][1],10,Model_topics)
+            temp['Topics'][1]['Index']=tlist[-2][1]
         except:
             return temp
         return temp
@@ -105,6 +108,7 @@ class TopicModel:
         temp['Topics'][0]['Words']=[]
         j=0
         ug=[]
+        temp['Topics'][0]['Index']=tlist[-2][1]
         for word,score in Model_topics['Topics'][tlist[-2][1]]['Words']:
             if j==10:
                 break
@@ -131,6 +135,7 @@ class TopicModel:
             temp['Topics'][0]['Words'].append(a)
         temp['Topics'].append(self.Topics_temp(tlist[-1][2],tlist[-1][0],total))
         temp['Topics'][1]['Words']=self.Topics_Words(tlist[-1][1],10,Model_topics)
+        temp['Topics'][1]['Index']=tlist[-1][1]
         return temp
     
     def topic_predict(self,bow_corpus,dictionary):

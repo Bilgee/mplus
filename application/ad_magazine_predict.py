@@ -89,7 +89,8 @@ class AdMatch:
                                     score += 0.2
                                 if temp2[cnt][1].get(str(temp['Ad_number'])) is not None:
                                     score += 0.1
-                                match.append([score, i['page_number'], magazine['Id']])
+                                temp3={"Score": score,"Page_number": i['page_number'],"Magazine_id": magazine['Id']}
+                                match.append(temp3)
                         cnt += 1
             match.sort(reverse=True)
             temp['Ad_page_match'] = match[:5]

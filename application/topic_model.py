@@ -136,7 +136,7 @@ class TopicModel:
         return temp
 
     def topic_predict(self, bow_corpus, dictionary):
-        predicted = []  # Huudas bureer hamaaragdah topiciin huwiig oruulna
+        predicted = [] 
         for page in bow_corpus:
             temp = {'Topics': []}
             t, total = self.topic_score(page, self.Tdictionary, dictionary)

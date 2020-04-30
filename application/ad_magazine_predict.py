@@ -27,7 +27,7 @@ class AdMatch:
                     if i == j or (wup_score is not None and wup_score > 0.8):
                         try:
                             result[str(ad['Id'])] += [i, j]
-                        except:
+                        except KeyError:
                             result[str(ad['Id'])] = [i, j]
         return result
 
@@ -89,7 +89,7 @@ class AdMatch:
                                     score += 0.2
                                 if temp2[cnt][1].get(str(temp['Ad_number'])) is not None:
                                     score += 0.1
-                                temp3={"Score": score,"Page_number": i['page_number'],"Magazine_id": magazine['Id']}
+                                temp3 = {"Score": score, "Page_number": i['page_number'], "Magazine_id": magazine['Id']}
                                 match.append(temp3)
                         cnt += 1
             match.sort(reverse=True)

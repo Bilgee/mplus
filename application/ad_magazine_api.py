@@ -3,9 +3,9 @@ from flask_restful import reqparse
 from log import logger
 
 
-class AdApi(Resource):
+class AdAPI(Resource):
     def __init__(self, **kwargs):
-        super(AdApi, self).__init__()
+        super(AdAPI, self).__init__()
         self.ad_mag = kwargs['ad_mag_predict']
         self.data = {
             u"response": {

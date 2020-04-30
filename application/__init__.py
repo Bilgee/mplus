@@ -4,11 +4,11 @@
     Importing predictor class & logger function along with flask server packages
 """
 import os
-from flask import Flask, request, json
-from flask_restful import Api, Resource
+from flask import Flask
+from flask_restful import Api
 from application.topic_model import TopicModel
 from application.topic_model_api import TopicModelAPI
-from application.ad_magazine_api import AdApi
+from application.ad_magazine_api import AdAPI
 from application.ad_magazine_predict import AdMatch
 from wplusner import Ner
 
@@ -25,5 +25,5 @@ ner_model = Ner()
 api.add_resource(TopicModelAPI, '/v1.0/topicmodel/en',
                  resource_class_kwargs={'topic_model': topic_model_en, 'ner_model': ner_model})
 
-api.add_resource(AdApi, '/v1.0/ad/en',
-                 resource_class_kwargs={'ad_mag_predict': ad_mag })
+api.add_resource(AdAPI, '/v1.0/ad/en',
+                 resource_class_kwargs={'ad_mag_predict': ad_mag})

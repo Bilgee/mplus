@@ -1,10 +1,6 @@
-from flask import Flask, jsonify, abort, request, json
 from flask_restful import Resource
 from flask_restful import reqparse
 from log import logger
-import numpy as np
-import time
-from wplusner import Ner
 
 
 class TopicModelAPI(Resource):

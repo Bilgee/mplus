@@ -95,7 +95,7 @@ class TopicModel:
             temp['Topics'].append(self.topics_temp(tlist[-2][2], tlist[-2][0], total))
             temp['Topics'][1]['Words'] = self.topics_words(tlist[-2][1], 10, model_topics)
             temp['Topics'][1]['Index'] = tlist[-2][1]
-        except:
+        except IndexError:
             return temp
         return temp
 

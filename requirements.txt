@@ -7,4 +7,4 @@ gensim
 nltk
 # deeppavlov
 # spacy
-git+ssh://git@github.com/fleshuu/ner.git
+git+ssh://git@github.com/fleshuu/wplusner.git

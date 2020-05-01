@@ -90,9 +90,9 @@ class AdMatch:
                                 if temp2[cnt][1].get(str(temp['Ad_number'])) is not None:
                                     score += 0.1
                                 temp3 = {"Score": score, "Page_number": i['page_number'], "Magazine_id": magazine['Id']}
-                                match.append(temp3)
+                                match.append([score, temp3])
                         cnt += 1
             match.sort(reverse=True)
-            temp['Ad_page_match'] = match[:5]
+            temp['Ad_page_match'] = match[:5][1]
             predict.append(temp)
         return predict

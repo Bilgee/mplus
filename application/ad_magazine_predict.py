@@ -4,6 +4,36 @@ import time
 from nltk.corpus import wordnet
 
 
+def calculate_wup_score(word1, word2, synset, calculation_needed):
+    if calculation_needed is False:
+        return 0
+    if word2 in synset:
+        word2_syn = synset[word2]
+    else:
+        try:
+            synset[word2] = wordnet.synsets(word2)[0]
+            word2_syn = synset[word2]
+        except:
+            synset[word2] = None
+            word2_syn = None
+    if word1 in synset:
+        word1_syn = synset[word1]
+    else:
+        try:
+            synset[word1] = wordnet.synsets(word1)[0]
+            word1_syn = synset[word1]
+        except:
+            synset[word1] = None
+            word1_syn = None
+    try:
+        wup_score = word2_syn.wup_similarity(word1_syn)
+    except AttributeError:
+        wup_score = 0
+    if wup_score is None:
+        wup_score = 0
+    return wup_score
+
+
 class AdMatch:
     def topic(self, ad):
         ad_text = []
@@ -15,38 +45,17 @@ class AdMatch:
         ad_topic = topic_model_ad.predict(ad_text, ad_id)
         return ad_topic
 
-    def ad_compare(self, lis, ads, synset):
+    def ad_compare(self, lis, ads, synset, calculate_word_similarity=True):
         result = {}
         for i in lis:
-            for index, ad in enumerate(ads):
+            for ad in ads:
                 for j in ad['Words']:
-                    try:
-                        ad_syn = synset[j]
-                    except:
+                    wup_score = calculate_wup_score(i, j, synset, calculate_word_similarity)
+                    if i == j or wup_score > 0.85:
                         try:
-                            synset[j] = wordnet.synsets(j)[0]
-                            ad_syn = synset[j]
-                        except:
-                            synset[j] = None
-                            ad_syn = None
-                    try:
-                        word_syn = synset[i]
-                    except:
-                        try:
-                            synset[i] = wordnet.synsets(i)[0]
-                            word_syn = synset[i]
-                        except:
-                            synset[i] = None
-                            word_syn = None
-                    try:
-                        wup_score = ad_syn.wup_similarity(word_syn)
-                    except:
-                        wup_score = 0
-                    if i == j or (wup_score is not None and wup_score > 0.85):
-                        try:
-                            result[str(ad['Id'])] += [i, j]
+                            result[str(ad['Id'])] += [[i, j]]
                         except KeyError:
-                            result[str(ad['Id'])] = [i, j]
+                            result[str(ad['Id'])] = [[i, j]]
         return result
 
     def keyword_match(self, ads, magazines):
@@ -64,7 +73,7 @@ class AdMatch:
                     if tfidfWord == '':
                         continue
                     page_keywords1.append(tfidfWord.lower())
-                match = self.ad_compare(page_keywords, ads, synset)
+                match = self.ad_compare(page_keywords, ads, synset, calculate_word_similarity=False)
                 match1 = self.ad_compare(page_keywords1, ads, synset)
                 key_words[str(magazine['Id'])].append([match, match1])
         print('\n\n---------- adCompare finished: took ', str(time.time() - start_time), ' seconds')
@@ -109,15 +118,30 @@ class AdMatch:
                                 score += (j['Score'] + q['Score']) / 2
                                 break
                     score *= 0.7
-                    if temp2[cnt][0].get(str(temp['Ad_number'])) is not None:
-                        score += 0.2
-                    if temp2[cnt][1].get(str(temp['Ad_number'])) is not None:
-                        score += 0.1
-                    match.append([score, i['page_number'], magazine['Id']])
+                    ner_match = temp2[cnt][0].get(str(temp['Ad_number']))
+                    if ner_match is not None:
+                        number_of_match = len(ner_match)
+                        if number_of_match == 1:
+                            score += 0.15
+                        if number_of_match == 2:
+                            score += 0.18
+                        if number_of_match >= 3:
+                            score += 0.2
+                    keyword_match = temp2[cnt][1].get(str(temp['Ad_number']))
+                    if keyword_match is not None:
+                        number_of_match = len(keyword_match)
+                        if number_of_match == 1:
+                            score += 0.04
+                        if number_of_match == 2:
+                            score += 0.08
+                        if number_of_match >= 3:
+                            score += 0.1
+                    if score != 0:
+                        match.append([score, i['page_number'], magazine['Id']])
                     cnt += 1
             match.sort(reverse=True)
             temp['Ad_page_match'] = []
-            for score, i, id2 in match[:5]:
-                temp['Ad_page_match'].append({"Score": score, "Page_number": i, "Magazine_id": id2})
+            for score, i, id2 in match[:10]:
+                temp['Ad_page_match'].append({"Score": round(score, 5), "Page_number": i, "Magazine_id": id2})
             predict.append(temp)
         return predict

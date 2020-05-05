@@ -21,6 +21,8 @@ lmdb data loader library-с шалтгаалан python3 дээр ажиллах
 virtualenv -p python3 venv
 source venv/bin/activate
 pip3 install -r requirements.txt
+python -m deeppavlov install ner_ontonotes_bert_mult
+python -m spacy download en_core_web_sm
 ```
 
 ## config file location root/application/config/config.yml

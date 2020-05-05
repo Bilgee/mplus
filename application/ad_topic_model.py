@@ -17,8 +17,8 @@ class AdTopicModel:
         """init class object
 
         Arguments:
-            model -- [Topics]
-            Tdictionary  -- [Topic words dictionary] 
+            model -- [topics]
+            Tdictionary  -- [topic words dictionary] 
         """
         with open("application/Newtopic.txt") as json_file:
             self.model = json.load(json_file)
@@ -26,7 +26,7 @@ class AdTopicModel:
             self.Tdictionary = json.load(json_file)
 
     def topics_temp(self, category, score, total, index):
-        temp = {'Category': category, 'Score': round((score / total), 4), 'Index': index}
+        temp = {'category': category, 'score': round((score / total), 4), 'index': index}
         return temp
 
     def topic_score(self, page, tdictionary, dictionary):
@@ -54,17 +54,17 @@ class AdTopicModel:
                     j = 1
                     i = 0
                     for p in range(word[1]):
-                        i += q['Score'] * j
+                        i += q['score'] * j
                         j *= 0.9
                     try:
-                        if i > s[q['Index']][0]:
-                            s[q['Index']][0] = i
-                        if q['Score'] > s[q['Index']][1]:
-                            s[q['Index']][1] = q['Score']
+                        if i > s[q['index']][0]:
+                            s[q['index']][0] = i
+                        if q['score'] > s[q['index']][1]:
+                            s[q['index']][1] = q['score']
                     except KeyError:
-                        s[q['Index']] = []
-                        s[q['Index']].append(i)
-                        s[q['Index']].append(q['Score'])
+                        s[q['index']] = []
+                        s[q['index']].append(i)
+                        s[q['index']].append(q['score'])
             for wo in s:
                 total += s[wo][0]
                 try:
@@ -78,27 +78,27 @@ class AdTopicModel:
 
     def score(self, temp, tlist, total):
         for t in tlist:
-            temp['Topics'].append(self.topics_temp(t[2], t[0], total, t[1]))
+            temp['topics'].append(self.topics_temp(t[2], t[0], total, t[1]))
         return temp
 
     def topic_predict(self, bow_corpus, dictionary):
         predicted = [] 
         for page in bow_corpus:
-            temp = {'Topics': []}
+            temp = {'topics': []}
             t, total = self.topic_score(page, self.Tdictionary, dictionary)
             tlist = []
             for q in t:
-                temp2 = self.model['Topics'][q]['Category']  # q ni topiciin index
+                temp2 = self.model['topics'][q]['category']  # q ni topiciin index
                 if t[q][1] > 0.05:
                     tlist.append([t[q][0], q, temp2])
                 else:
                     total -= t[q][0]
             tlist.sort(reverse=True)
             if total == 0 or len(tlist) == 0:
-                temp2 = {'Category': 'Unknown', 'Score': 0}
-                a = {"Text": "", "Score": 0}
+                temp2 = {'category': 'unknown', 'score': 0}
+                a = {"text": "", "score": 0}
                 temp2['Words'] = [a]
-                temp['Topics'].append(temp2)
+                temp['topics'].append(temp2)
                 predicted.append(temp)
                 continue
             temp = self.score(temp, tlist, total)
@@ -112,7 +112,7 @@ class AdTopicModel:
         predicted = []
         cnt = 0
         for doc in topic_predictions:
-            temp2 = {"Topic": doc['Topics'], "ad_number": ad_numbers[cnt]}
+            temp2 = {"topic": doc['topics'], "ad_number": ad_numbers[cnt]}
             cnt += 1
             predicted.append(temp2)
         return predicted

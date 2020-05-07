@@ -28,6 +28,6 @@ class AdAPI(Resource):
                 self.data['response']['code'] = 0
                 self.data['response']['text'] = self.ad_mag.predict(data, 10)
             return self.data
-        except:
-            logger.exception('ERROR')
+        except Exception as e:
+            logger.exception('ERROR', exc_info=e)
             return self.data

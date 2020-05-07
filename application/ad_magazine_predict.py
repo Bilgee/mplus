@@ -104,6 +104,7 @@ class AdMatch:
         predict = []
         for magazine in magazines:
             temp2 = ad_keywords[str(magazine['id'])]
+            temp3 = {"magazine_id": magazine['id'], "ad_match": []}
             for a in ad_topic:
                 cnt = 0
                 temp = {'ad_page_match': [], 'ad_number': a['ad_number']}
@@ -111,6 +112,8 @@ class AdMatch:
                 for i in magazine["pages"]:
                     score = 0
                     for q in a['topic']:
+                        if q['category'] == 'unknown':
+                            continue
                         for j in i['topic']:
                             if not j['category'] == 'unknown' and j['index'] == q['index']:
                                 score += (j['score'] + q['score']) / 2
@@ -140,5 +143,6 @@ class AdMatch:
                 match.sort(reverse=True)
                 for score, i, id2 in match[:top]:
                     temp['ad_page_match'].append({"score": round(score, 5), "page_number": i, "magazine_id": id2})
-            predict.append({"magazine_id": magazine['id'], "ad_match": temp})
+                temp3["ad_match"].append(temp)
+            predict.append(temp3)
         return predict

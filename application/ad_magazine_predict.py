@@ -79,7 +79,7 @@ class AdMatch:
         print('\n\n---------- adCompare finished: took ', str(time.time() - start_time), ' seconds')
         return key_words
 
-    def predict(self, data):
+    def predict(self, data, top):
         """
             {
             "ad": [{ "id": 52,
@@ -101,15 +101,13 @@ class AdMatch:
         magazines = data['magazines']
         ad_topic = self.topic(ad)
         ad_keywords = self.keyword_match(ad, magazines)
-
         predict = []
         for magazine in magazines:
-            temp = {}
-            match = []
-            temp['ad_number'] = a['ad_number']
+            temp2 = ad_keywords[str(magazine['id'])]
             for a in ad_topic:
                 cnt = 0
-                temp2 = ad_keywords[str(magazine['id'])]
+                temp = {'ad_page_match': [], 'ad_number': a['ad_number']}
+                match = []
                 for i in magazine["pages"]:
                     score = 0
                     for q in a['topic']:
@@ -139,9 +137,8 @@ class AdMatch:
                     if score != 0:
                         match.append([score, i['page_number'], magazine['id']])
                     cnt += 1
-            match.sort(reverse=True)
-            temp['ad_page_match'] = []
-            for score, i, id2 in match[:10]:
-                temp['ad_page_match'].append({"score": round(score, 5), "page_number": i, "magazine_id": id2})
-            predict.append(temp)
+                match.sort(reverse=True)
+                for score, i, id2 in match[:top]:
+                    temp['ad_page_match'].append({"score": round(score, 5), "page_number": i, "magazine_id": id2})
+            predict.append({"magazine_id": magazine['id'], "ad_match": temp})
         return predict

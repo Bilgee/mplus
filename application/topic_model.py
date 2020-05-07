@@ -17,7 +17,7 @@ class TopicModel:
         """init class object
 
         Arguments:
-            model -- [Topics]
+            model -- [topics]
             Tdictionary  -- [Topic words dictionary] 
         """
         with open("application/Newtopic.txt") as json_file:
@@ -28,16 +28,16 @@ class TopicModel:
     def topics_words(self, index, number, model_topics):
         temp = []
         j = 0
-        for word in model_topics['Topics'][index]['Words']:
+        for word in model_topics['topics'][index]['words']:
             if j == number:
                 break
-            a = {"Text": word[0], "Score": round(word[1], 4)}
+            a = {"text": word[0], "score": round(word[1], 4)}
             temp.append(a)
             j += 1
         return temp
 
     def topics_temp(self, category, score, total):
-        temp = {'Category': category, 'Score': round((score / total), 4)}
+        temp = {'category': category, 'score': round((score / total), 4)}
         return temp
 
     def topic_score(self, page, tdictionary, dictionary):
@@ -65,17 +65,17 @@ class TopicModel:
                     j = 1
                     i = 0
                     for p in range(word[1]):
-                        i += q['Score'] * j
+                        i += q['score'] * j
                         j *= 0.9
                     try:
-                        if i > s[q['Index']][0]:
-                            s[q['Index']][0] = i
-                        if q['Score'] > s[q['Index']][1]:
-                            s[q['Index']][1] = q['Score']
+                        if i > s[q['index']][0]:
+                            s[q['index']][0] = i
+                        if q['score'] > s[q['index']][1]:
+                            s[q['index']][1] = q['score']
                     except KeyError:
-                        s[q['Index']] = []
-                        s[q['Index']].append(i)
-                        s[q['Index']].append(q['Score'])
+                        s[q['index']] = []
+                        s[q['index']].append(i)
+                        s[q['index']].append(q['score'])
             for wo in s:
                 total += s[wo][0]
                 try:
@@ -88,13 +88,13 @@ class TopicModel:
         return t, total
 
     def max_score(self, temp, tlist, model_topics, total):
-        temp['Topics'].append(self.topics_temp(tlist[-1][2], tlist[-1][0], total))
-        temp['Topics'][0]['Words'] = self.topics_words(tlist[-1][1], 10, model_topics)
-        temp['Topics'][0]['Index'] = tlist[-1][1]
+        temp['topics'].append(self.topics_temp(tlist[-1][2], tlist[-1][0], total))
+        temp['topics'][0]['words'] = self.topics_words(tlist[-1][1], 10, model_topics)
+        temp['topics'][0]['index'] = tlist[-1][1]
         try:
-            temp['Topics'].append(self.topics_temp(tlist[-2][2], tlist[-2][0], total))
-            temp['Topics'][1]['Words'] = self.topics_words(tlist[-2][1], 10, model_topics)
-            temp['Topics'][1]['Index'] = tlist[-2][1]
+            temp['topics'].append(self.topics_temp(tlist[-2][2], tlist[-2][0], total))
+            temp['topics'][1]['words'] = self.topics_words(tlist[-2][1], 10, model_topics)
+            temp['topics'][1]['index'] = tlist[-2][1]
         except IndexError:
             return temp
         return temp
@@ -103,24 +103,24 @@ class TopicModel:
         if not tlist[-2][2] == tlist[-3][2] or tlist[-3][0] + tlist[-2][0] < tlist[-1][0]:
             temp = self.max_score(temp, tlist, model_topics, total)
             return temp
-        temp['Topics'].append(self.topics_temp(tlist[-2][2], tlist[-3][0] + tlist[-2][0], total))
-        temp['Topics'][0]['Words'] = []
+        temp['topics'].append(self.topics_temp(tlist[-2][2], tlist[-3][0] + tlist[-2][0], total))
+        temp['topics'][0]['words'] = []
         j = 0
         ug = []
-        temp['Topics'][0]['Index'] = tlist[-2][1]
-        for word, score in model_topics['Topics'][tlist[-2][1]]['Words']:
+        temp['topics'][0]['index'] = tlist[-2][1]
+        for word, score in model_topics['topics'][tlist[-2][1]]['words']:
             if j == 10:
                 break
             ug.append([score, word])
             j += 1
         j = 0
-        for word, score in model_topics['Topics'][tlist[-3][1]]['Words']:
+        for word, score in model_topics['topics'][tlist[-3][1]]['words']:
             if j == 10:
                 break
             ug.append([score, word])
             j += 1
         ug.sort()
-        temp['Topics'][0]['Words'].append(ug[-1][1])
+        temp['topics'][0]['words'].append(ug[-1][1])
         j = 0
         for i in range(len(ug) - 1):
             if ug[(-1) * i - 2][1] == ug[(-1) * i - 1][1]:
@@ -128,31 +128,31 @@ class TopicModel:
             if j == 10:
                 break
             j += 1
-            a = {"Text": ug[(-1) * i - 2][1], "Score": round(ug[(-1) * i - 2][0], 4)}
-            temp['Topics'][0]['Words'].append(a)
-        temp['Topics'].append(self.topics_temp(tlist[-1][2], tlist[-1][0], total))
-        temp['Topics'][1]['Words'] = self.topics_words(tlist[-1][1], 10, model_topics)
-        temp['Topics'][1]['Index'] = tlist[-1][1]
+            a = {"text": ug[(-1) * i - 2][1], "score": round(ug[(-1) * i - 2][0], 4)}
+            temp['topics'][0]['words'].append(a)
+        temp['topics'].append(self.topics_temp(tlist[-1][2], tlist[-1][0], total))
+        temp['topics'][1]['words'] = self.topics_words(tlist[-1][1], 10, model_topics)
+        temp['topics'][1]['index'] = tlist[-1][1]
         return temp
 
     def topic_predict(self, bow_corpus, dictionary):
         predicted = [] 
         for page in bow_corpus:
-            temp = {'Topics': []}
+            temp = {'topics': []}
             t, total = self.topic_score(page, self.Tdictionary, dictionary)
             tlist = []
             for q in t:
-                temp2 = self.model['Topics'][q]['Category']  # q ni topiciin index
+                temp2 = self.model['topics'][q]['category']  # q ni topiciin index
                 if t[q][1] > 0.05:
                     tlist.append([t[q][0], q, temp2])
                 else:
                     total -= t[q][0]
             tlist.sort()
             if total == 0 or len(tlist) == 0:
-                temp2 = {'Category': 'Unknown', 'Score': 0}
-                a = {"Text": "", "Score": 0}
-                temp2['Words'] = [a]
-                temp['Topics'].append(temp2)
+                temp2 = {'category': 'unknown', 'score': 0}
+                a = {"text": "", "score": 0}
+                temp2['words'] = [a]
+                temp['topics'].append(temp2)
                 predicted.append(temp)
                 continue
             if len(tlist) == 1 or len(tlist) == 2:
@@ -190,15 +190,15 @@ class TopicModel:
             top_8_or_so_words += [tmp]
         cnt = 0
         for doc in topic_predictions:
-            temp2 = {"Topic": doc['Topics'], "Named Entity": []}
+            temp2 = {"topic": doc['topics'], "named entity": []}
             for word in ner[cnt]:
                 temp = {}
                 if word == '':
                     continue
-                temp["Text"] = word[0]
-                temp["Label"] = word[1]
-                temp2["Named Entity"].append(temp)
-            temp2["Keywords"] = top_8_or_so_words[cnt]
+                temp["text"] = word[0]
+                temp["label"] = word[1]
+                temp2["named entity"].append(temp)
+            temp2["keywords"] = top_8_or_so_words[cnt]
             temp2["page_number"] = page_numbers[cnt]
             cnt += 1
             predicted.append(temp2)

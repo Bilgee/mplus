@@ -7,75 +7,75 @@ from nltk.corpus import wordnet
 def calculate_wup_score(word1, word2, synset, calculation_needed):
     if calculation_needed is False:
         return 0
-    if word2 in synset:
-        word2_syn = synset[word2]
-    else:
-        try:
+    if word2 not in synset:
+        if wordnet.synsets(word2):
             synset[word2] = wordnet.synsets(word2)[0]
-            word2_syn = synset[word2]
-        except:
+        else:
             synset[word2] = None
-            word2_syn = None
-    if word1 in synset:
-        word1_syn = synset[word1]
-    else:
-        try:
+    word2_syn = synset[word2]
+
+    if word1 not in synset:
+        if wordnet.synsets(word1):
             synset[word1] = wordnet.synsets(word1)[0]
-            word1_syn = synset[word1]
-        except:
+        else:
             synset[word1] = None
-            word1_syn = None
-    try:
+    word1_syn = synset[word1]
+    if word1_syn and word2_syn:
         wup_score = word2_syn.wup_similarity(word1_syn)
-    except AttributeError:
+        if wup_score is None:
+            wup_score = 0
+    else:
         wup_score = 0
-    if wup_score is None:
-        wup_score = 0
+
     return wup_score
 
 
+def topic(ad):
+    ad_text = []
+    ad_id = []
+    for temp in ad:
+        ad_text.append(temp['words'])
+        ad_id.append(temp['id'])
+    topic_model_ad = AdTopicModel()
+    ad_topic = topic_model_ad.predict(ad_text, ad_id)
+    return ad_topic
+
+
+def ad_compare(lis, ads, synset, calculate_word_similarity=True):
+    result = {}
+    for ad in ads:
+        result[str(ad['id'])] = set()
+        for i in lis:
+            for j in ad['words']:
+                wup_score = calculate_wup_score(i, j, synset, calculate_word_similarity)
+                if i == j or wup_score > 0.85:
+                    result[str(ad['id'])].add((i, j))
+    return result
+
+
+def match_keywords(ads, magazines):
+    key_words = {}
+    synset = {}
+    start_time = time.time()
+    for magazine in magazines:
+        key_words[str(magazine['id'])] = []
+        for page in magazine['pages']:
+            page_keywords = []
+            page_keywords1 = []
+            for entity in page['named entity']:
+                page_keywords.append(entity['text'].lower())
+            for tfidfWord in page['keywords']:
+                if tfidfWord == '':
+                    continue
+                page_keywords1.append(tfidfWord.lower())
+            match = ad_compare(page_keywords, ads, synset, calculate_word_similarity=False)
+            match1 = ad_compare(page_keywords1, ads, synset)
+            key_words[str(magazine['id'])].append([match, match1])
+    print('\n\n---------- adCompare finished: took ', str(time.time() - start_time), ' seconds')
+    return key_words
+
+
 class AdMatch:
-    def topic(self, ad):
-        ad_text = []
-        ad_id = []
-        for temp in ad:
-            ad_text.append(temp['words'])
-            ad_id.append(temp['id'])
-        topic_model_ad = AdTopicModel()
-        ad_topic = topic_model_ad.predict(ad_text, ad_id)
-        return ad_topic
-
-    def ad_compare(self, lis, ads, synset, calculate_word_similarity=True):
-        result = {}
-        for ad in ads:
-            result[str(ad['id'])] = set()
-            for i in lis:
-                for j in ad['words']:
-                    wup_score = calculate_wup_score(i, j, synset, calculate_word_similarity)
-                    if i == j or wup_score > 0.85:
-                        result[str(ad['id'])].add((i, j))
-        return result
-
-    def keyword_match(self, ads, magazines):
-        key_words = {}
-        synset = {}
-        start_time = time.time()
-        for magazine in magazines:
-            key_words[str(magazine['id'])] = []
-            for page in magazine['pages']:
-                page_keywords = []
-                page_keywords1 = []
-                for entity in page['named entity']:
-                    page_keywords.append(entity['text'].lower())
-                for tfidfWord in page['keywords']:
-                    if tfidfWord == '':
-                        continue
-                    page_keywords1.append(tfidfWord.lower())
-                match = self.ad_compare(page_keywords, ads, synset, calculate_word_similarity=False)
-                match1 = self.ad_compare(page_keywords1, ads, synset)
-                key_words[str(magazine['id'])].append([match, match1])
-        print('\n\n---------- adCompare finished: took ', str(time.time() - start_time), ' seconds')
-        return key_words
 
     def predict(self, data, top):
         """
@@ -97,8 +97,8 @@ class AdMatch:
         """
         ad = data['ad']
         magazines = data['magazines']
-        ad_topic = self.topic(ad)
-        ad_keywords = self.keyword_match(ad, magazines)
+        ad_topic = topic(ad)
+        ad_keywords = match_keywords(ad, magazines)
         predict = []
         for magazine in magazines:
             temp2 = ad_keywords[str(magazine['id'])]

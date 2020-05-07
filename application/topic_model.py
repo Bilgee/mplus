@@ -8,7 +8,6 @@ from nltk.stem import WordNetLemmatizer
 
 nltk.download('wordnet')
 
-
 wordnet_lemmatizer = WordNetLemmatizer()
 
 
@@ -18,7 +17,7 @@ class TopicModel:
 
         Arguments:
             model -- [topics]
-            Tdictionary  -- [Topic words dictionary] 
+            Tdictionary  -- [Topic words dictionary]
         """
         with open("application/Newtopic.txt") as json_file:
             self.model = json.load(json_file)
@@ -48,18 +47,18 @@ class TopicModel:
             w = wordnet_lemmatizer.lemmatize(w)
             syns = wordnet.synsets(w)
             dd = set()
-            try:
+            if syns:
                 syn = syns[0]
                 if fnmatch.fnmatch(syn.name(), "*.n.*"):
                     for s in syn.lemmas():
                         dd.add(s.name())
-            except:
+            else:
                 dd.add(w)
             s = {}
             for ug in dd:
-                try:
-                    temp2 = tdictionary[ug]
-                except KeyError:
+                if tdictionary.get(ug):
+                    temp2 = tdictionary.get(ug)
+                else:
                     continue
                 for q in temp2:
                     j = 1
@@ -67,21 +66,21 @@ class TopicModel:
                     for p in range(word[1]):
                         i += q['score'] * j
                         j *= 0.9
-                    try:
+                    if s.get(q['index']):
                         if i > s[q['index']][0]:
                             s[q['index']][0] = i
                         if q['score'] > s[q['index']][1]:
                             s[q['index']][1] = q['score']
-                    except KeyError:
+                    else:
                         s[q['index']] = []
                         s[q['index']].append(i)
                         s[q['index']].append(q['score'])
             for wo in s:
                 total += s[wo][0]
-                try:
+                if t.get(wo):
                     t[wo][0] += s[wo][0]
                     t[wo][1] += s[wo][1]
-                except KeyError:
+                else:
                     t[wo] = []
                     t[wo].append(s[wo][0])
                     t[wo].append(s[wo][1])
@@ -91,11 +90,11 @@ class TopicModel:
         temp['topics'].append(self.topics_temp(tlist[-1][2], tlist[-1][0], total))
         temp['topics'][0]['words'] = self.topics_words(tlist[-1][1], 10, model_topics)
         temp['topics'][0]['index'] = tlist[-1][1]
-        try:
+        if len(temp['topics']) > 1:
             temp['topics'].append(self.topics_temp(tlist[-2][2], tlist[-2][0], total))
             temp['topics'][1]['words'] = self.topics_words(tlist[-2][1], 10, model_topics)
             temp['topics'][1]['index'] = tlist[-2][1]
-        except IndexError:
+        else:
             return temp
         return temp
 
@@ -136,7 +135,7 @@ class TopicModel:
         return temp
 
     def topic_predict(self, bow_corpus, dictionary):
-        predicted = [] 
+        predicted = []
         for page in bow_corpus:
             temp = {'topics': []}
             t, total = self.topic_score(page, self.Tdictionary, dictionary)

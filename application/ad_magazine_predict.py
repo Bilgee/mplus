@@ -47,15 +47,13 @@ class AdMatch:
 
     def ad_compare(self, lis, ads, synset, calculate_word_similarity=True):
         result = {}
-        for i in lis:
-            for ad in ads:
+        for ad in ads:
+            result[str(ad['id'])] = set()
+            for i in lis:
                 for j in ad['words']:
                     wup_score = calculate_wup_score(i, j, synset, calculate_word_similarity)
                     if i == j or wup_score > 0.85:
-                        try:
-                            result[str(ad['id'])] += [[i, j]]
-                        except KeyError:
-                            result[str(ad['id'])] = [[i, j]]
+                        result[str(ad['id'])].add((i, j))
         return result
 
     def keyword_match(self, ads, magazines):

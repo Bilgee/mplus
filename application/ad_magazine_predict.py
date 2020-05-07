@@ -68,7 +68,7 @@ class AdMatch:
                 page_keywords = []
                 page_keywords1 = []
                 for entity in page['named entity']:
-                    page_keywords.append(entity['Text'].lower())
+                    page_keywords.append(entity['text'].lower())
                 for tfidfWord in page['keywords']:
                     if tfidfWord == '':
                         continue

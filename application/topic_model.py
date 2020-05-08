@@ -11,159 +11,6 @@ nltk.download('wordnet')
 wordnet_lemmatizer = WordNetLemmatizer()
 
 
-def topics_words(index, number, model_topics):
-    """
-
-    @param index: topic index
-    @param number: butsaah ugiin too
-    @param model_topics: topic word,category etc.. from Newtopic file
-    @return: list of topic words
-    """
-    temp = []
-    j = 0
-    for word in model_topics['topics'][index]['words']:
-        if j == number:
-            break
-        a = {"text": word[0], "score": round(word[1], 4)}
-        temp.append(a)
-        j += 1
-    return temp
-
-
-def topics_temp(category, score, total):
-    """
-
-    @param category: topic category
-    @param score: score of 1 topic
-    @param total: score of all topic
-    @return: huwichilsan onoo (dictionary)
-    """
-    return {'category': category, 'score': round((score / total), 4)}
-
-
-def topic_score(page, tdictionary, dictionary):
-    """
-
-    @param page: text list of 1 page
-    @param tdictionary: topic dictionary from Tdictionary file
-    @param dictionary: dictionary of magazine
-    @return: topic tus buriin niit score, buh topic-n niilber onoo
-    """
-    total = 0
-    t = {}  # topic buriin niit score
-    for word in page:
-        w = dictionary[word[0]]
-        w = wordnet_lemmatizer.lemmatize(w)
-        syns = wordnet.synsets(w)
-        dd = set()
-        if syns:
-            syn = syns[0]
-            if fnmatch.fnmatch(syn.name(), "*.n.*"):
-                for s in syn.lemmas():
-                    dd.add(s.name())
-        else:
-            dd.add(w)
-        s = {}
-        for ug in dd:
-            if tdictionary.get(ug):
-                temp2 = tdictionary.get(ug)
-            else:
-                continue
-            for q in temp2:
-                j = 1
-                i = 0
-                for p in range(word[1]):
-                    i += q['score'] * j
-                    j *= 0.9
-                if s.get(q['index']):
-                    if i > s[q['index']][0]:
-                        s[q['index']][0] = i
-                    if q['score'] > s[q['index']][1]:
-                        s[q['index']][1] = q['score']
-                else:
-                    s[q['index']] = []
-                    s[q['index']].append(i)
-                    s[q['index']].append(q['score'])
-        for wo in s:
-            total += s[wo][0]
-            if t.get(wo):
-                t[wo][0] += s[wo][0]
-                t[wo][1] += s[wo][1]
-            else:
-                t[wo] = []
-                t[wo].append(s[wo][0])
-                t[wo].append(s[wo][1])
-    return t, total
-
-
-def max_score(temp, tlist, model_topics, total):
-    """
-    Hamgiin ih onootoi 2 topiciin onoonii zuruu ih tohioldold top 2iig ene function-r songono.
-
-    @param temp: top topics list
-    @param tlist: topics list(score,topic index,category)
-    @param model_topics: topic word,category etc.. from Newtopic file
-    @param total: total score of all topics
-    @return: temp(top topics list)
-    """
-    temp['topics'].append(topics_temp(tlist[-1][2], tlist[-1][0], total))
-    temp['topics'][0]['words'] = topics_words(tlist[-1][1], 10, model_topics)
-    temp['topics'][0]['index'] = tlist[-1][1]
-    if len(temp['topics']) > 1:
-        temp['topics'].append(topics_temp(tlist[-2][2], tlist[-2][0], total))
-        temp['topics'][1]['words'] = topics_words(tlist[-2][1], 10, model_topics)
-        temp['topics'][1]['index'] = tlist[-2][1]
-    else:
-        return temp
-    return temp
-
-
-def max_category(temp, tlist, model_topics, total):
-    """
-    Hamgiin ih onootoi 2 topiciin onoonii zuruu baga tohioldold top 2iig ene function-r songono.
-
-    @param temp: top topics list
-    @param tlist: topics list(score,topic index,category)
-    @param model_topics: topic word,category etc.. from Newtopic file
-    @param total: total score of all topics
-    @return: temp(top topics list)
-    """
-    if not tlist[-2][2] == tlist[-3][2] or tlist[-3][0] + tlist[-2][0] < tlist[-1][0]:
-        temp = max_score(temp, tlist, model_topics, total)
-        return temp
-    temp['topics'].append(topics_temp(tlist[-2][2], tlist[-3][0] + tlist[-2][0], total))
-    temp['topics'][0]['words'] = []
-    j = 0
-    ug = []
-    temp['topics'][0]['index'] = tlist[-2][1]
-    for word, score in model_topics['topics'][tlist[-2][1]]['words']:
-        if j == 10:
-            break
-        ug.append([score, word])
-        j += 1
-    j = 0
-    for word, score in model_topics['topics'][tlist[-3][1]]['words']:
-        if j == 10:
-            break
-        ug.append([score, word])
-        j += 1
-    ug.sort()
-    temp['topics'][0]['words'].append(ug[-1][1])
-    j = 0
-    for i in range(len(ug) - 1):
-        if ug[(-1) * i - 2][1] == ug[(-1) * i - 1][1]:
-            continue
-        if j == 10:
-            break
-        j += 1
-        a = {"text": ug[(-1) * i - 2][1], "score": round(ug[(-1) * i - 2][0], 4)}
-        temp['topics'][0]['words'].append(a)
-    temp['topics'].append(topics_temp(tlist[-1][2], tlist[-1][0], total))
-    temp['topics'][1]['words'] = topics_words(tlist[-1][1], 10, model_topics)
-    temp['topics'][1]['index'] = tlist[-1][1]
-    return temp
-
-
 class TopicModel:
     def __init__(self):
         """init class object
@@ -177,15 +24,211 @@ class TopicModel:
         with open("application/Tdictionary.txt") as json_file:
             self.Tdictionary = json.load(json_file)
 
+    @staticmethod
+    def topics_words(index, number, model_topics):
+        """
+
+        Parameters
+        ----------
+        index : int
+            topic index
+        number : int
+            butsaah ugiin too
+        model_topics : dict
+            topic word,category etc.. from Newtopic file
+        Returns
+        -------
+        list
+            list of topic words
+        """
+        temp = []
+        j = 0
+        for word in model_topics['topics'][index]['words']:
+            if j == number:
+                break
+            a = {"text": word[0], "score": round(word[1], 4)}
+            temp.append(a)
+            j += 1
+        return temp
+
+    @staticmethod
+    def topics_temp(category, score, total):
+        """
+
+        Parameters
+        ----------
+        category : string
+            topic category
+        score : float
+            score of 1 topic
+        total : float
+            score of all topic
+
+        Returns
+        -------
+        dict
+            huwichilsan onoo
+        """
+        return {'category': category, 'score': round((score / total), 4)}
+
+    @staticmethod
+    def topic_score(page, tdictionary, dictionary):
+        """
+
+        Parameters
+        ----------
+        page : list
+            text list of 1 page
+        tdictionary : dict
+            topic dictionary from Tdictionary file
+        dictionary : object of gensim.corpora.dictionary
+            dictionary of magazine
+
+        Returns
+        -------
+        list
+            topic tus buriin niit score
+        float
+            buh topic-n niilber onoo
+
+        """
+        total = 0
+        t = {}  # topic buriin niit score
+        for word in page:
+            w = dictionary[word[0]]
+            w = wordnet_lemmatizer.lemmatize(w)
+            syns = wordnet.synsets(w)
+            dd = set()
+            if syns:
+                syn = syns[0]
+                if fnmatch.fnmatch(syn.name(), "*.n.*"):
+                    for s in syn.lemmas():
+                        dd.add(s.name())
+            else:
+                dd.add(w)
+            s = {}
+            for ug in dd:
+                if tdictionary.get(ug):
+                    temp2 = tdictionary.get(ug)
+                else:
+                    continue
+                for q in temp2:
+                    j = 1
+                    i = 0
+                    for p in range(word[1]):
+                        i += q['score'] * j
+                        j *= 0.9
+                    if s.get(q['index']):
+                        if i > s[q['index']][0]:
+                            s[q['index']][0] = i
+                        if q['score'] > s[q['index']][1]:
+                            s[q['index']][1] = q['score']
+                    else:
+                        s[q['index']] = []
+                        s[q['index']].append(i)
+                        s[q['index']].append(q['score'])
+            for wo in s:
+                total += s[wo][0]
+                if t.get(wo):
+                    t[wo][0] += s[wo][0]
+                    t[wo][1] += s[wo][1]
+                else:
+                    t[wo] = []
+                    t[wo].append(s[wo][0])
+                    t[wo].append(s[wo][1])
+        return t, total
+
+    def max_score(self, temp, tlist, model_topics, total):
+        """Hamgiin ih onootoi 2 topiciin onoonii zuruu ih tohioldold top 2iig ene function-r songono.
+
+        Parameters
+        ----------
+        temp : list
+            top topics list
+        tlist : list
+            topics list(score,topic index,category)
+        model_topics : dict
+            topic word,category etc.. from Newtopic file
+        total : float
+            total score of all topics
+        Returns
+        -------
+        list
+            temp(top topics list)
+        """
+        temp['topics'].append(self.topics_temp(tlist[-1][2], tlist[-1][0], total))
+        temp['topics'][0]['words'] = self.topics_words(tlist[-1][1], 10, model_topics)
+        temp['topics'][0]['index'] = tlist[-1][1]
+        if len(temp['topics']) > 1:
+            temp['topics'].append(self.topics_temp(tlist[-2][2], tlist[-2][0], total))
+            temp['topics'][1]['words'] = self.topics_words(tlist[-2][1], 10, model_topics)
+            temp['topics'][1]['index'] = tlist[-2][1]
+        else:
+            return temp
+        return temp
+
+    def max_category(self, temp, tlist, model_topics, total):
+        """Hamgiin ih onootoi 2 topiciin onoonii zuruu baga tohioldold top 2iig ene function-r songono.
+
+        Parameters
+        ----------
+        temp : list
+            top topics list
+        tlist : list
+            topics list(score,topic index,category)
+        model_topics : dict
+            topic word,category etc.. from Newtopic file
+        total : float
+            total score of all topics
+        Returns
+        -------
+        list
+            temp(top topics list)
+        """
+        if not tlist[-2][2] == tlist[-3][2] or tlist[-3][0] + tlist[-2][0] < tlist[-1][0]:
+            temp = self.max_score(temp, tlist, model_topics, total)
+            return temp
+        temp['topics'].append(self.topics_temp(tlist[-2][2], tlist[-3][0] + tlist[-2][0], total))
+        temp['topics'][0]['words'] = []
+        j = 0
+        ug = []
+        temp['topics'][0]['index'] = tlist[-2][1]
+        for word, score in model_topics['topics'][tlist[-2][1]]['words']:
+            if j == 10:
+                break
+            ug.append([score, word])
+            j += 1
+        j = 0
+        for word, score in model_topics['topics'][tlist[-3][1]]['words']:
+            if j == 10:
+                break
+            ug.append([score, word])
+            j += 1
+        ug.sort()
+        temp['topics'][0]['words'].append(ug[-1][1])
+        j = 0
+        for i in range(len(ug) - 1):
+            if ug[(-1) * i - 2][1] == ug[(-1) * i - 1][1]:
+                continue
+            if j == 10:
+                break
+            j += 1
+            a = {"text": ug[(-1) * i - 2][1], "score": round(ug[(-1) * i - 2][0], 4)}
+            temp['topics'][0]['words'].append(a)
+        temp['topics'].append(self.topics_temp(tlist[-1][2], tlist[-1][0], total))
+        temp['topics'][1]['words'] = self.topics_words(tlist[-1][1], 10, model_topics)
+        temp['topics'][1]['index'] = tlist[-1][1]
+        return temp
+
     def topic_predict(self, bow_corpus, dictionary):
         """
 
         Parameters
         ----------
-        bow_corpus
+        bow_corpus : list
             bag of words ( magazine )
-        dictionary
-            dictionary of magazine ( corpora object )
+        dictionary : object of gensim.corpora.dictionary
+            dictionary of magazine
 
         Returns
         -------
@@ -195,7 +238,7 @@ class TopicModel:
         predicted = []
         for page in bow_corpus:
             temp = {'topics': []}
-            t, total = topic_score(page, self.Tdictionary, dictionary)
+            t, total = self.topic_score(page, self.Tdictionary, dictionary)
             tlist = []
             for q in t:
                 temp2 = self.model['topics'][q]['category']  # q ni topiciin index
@@ -212,15 +255,15 @@ class TopicModel:
                 predicted.append(temp)
                 continue
             if len(tlist) == 1 or len(tlist) == 2:
-                temp = max_score(temp, tlist, self.model, total)
+                temp = self.max_score(temp, tlist, self.model, total)
                 predicted.append(temp)
                 continue
             elif tlist[-1][0] * 0.8 > tlist[-2][0] or tlist[-1][2] == tlist[-2][2]:
-                temp = max_score(temp, tlist, self.model, total)
+                temp = self.max_score(temp, tlist, self.model, total)
                 predicted.append(temp)
                 continue
             else:
-                temp = max_category(temp, tlist, self.model, total)
+                temp = self.max_category(temp, tlist, self.model, total)
                 predicted.append(temp)
                 continue
         return predicted
@@ -230,11 +273,11 @@ class TopicModel:
 
         Parameters
         ----------
-        clean_text
+        clean_text : list
             tokenized word list
-        ner
-            NER words of deeppavlov ( list )
-        page_numbers
+        ner : list
+            NER words of deeppavlov
+        page_numbers : list
             page numbers list
 
         Returns

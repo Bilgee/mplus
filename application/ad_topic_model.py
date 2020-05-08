@@ -14,17 +14,19 @@ def topic_score(page, tdictionary, dictionary):
 
     Parameters
     ----------
-    page :
+    page : list
         text list of 1 page
-    tdictionary :
+    tdictionary : dict
         topic dictionary from Tdictionary file
-    dictionary :
+    dictionary : object of gensim.corpora.dictionary
         dictionary of magazine
 
     Returns
     -------
-    int
-        topic tus buriin niit score, buh topic-n niilber onoo
+    list
+        topic tus buriin niit score
+    float
+        buh topic-n niilber onoo
     """
     total = 0
     t = {}  # topic buriin niit score
@@ -91,9 +93,9 @@ class AdTopicModel:
 
         Parameters
         ----------
-        bow_corpus
+        bow_corpus : list
             bag of words (ad)
-        dictionary
+        dictionary : object of gensim.corpora.dictionary
             dictionary of ad
 
         Returns
@@ -130,9 +132,9 @@ class AdTopicModel:
 
         Parameters
         ----------
-        clean_text
+        clean_text : list
             tokenized word list
-        ad_numbers
+        ad_numbers : list
             id list of ad
 
         Returns

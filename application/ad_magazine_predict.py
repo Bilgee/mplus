@@ -9,11 +9,11 @@ def calculate_wup_score(word1, word2, synset, calculation_needed):
 
     Parameters
     ----------
-    word1 : str
-    word2 : str
-    synset :dict
+    word1: str
+    word2: str
+    synset: dict
         saves synonym set of nltk.wordnet to save time on multiple call
-    calculation_needed : bool
+    calculation_needed: bool
         if false returns 0
 
     Returns
@@ -51,7 +51,7 @@ def topic(ad):
 
     Parameters
     ----------
-    ad
+    ad : list
         ad data
     Returns
     -------
@@ -79,7 +79,7 @@ def ad_compare(lis, ads, synset, calculate_word_similarity=True):
         list containing ads
     synset : dict
         saves synonym set of nltk.wordnet to save time on multiple call
-    calculate_word_similarity : bool
+    calculate_word_similarity : bool, optional
         false if words have to exact same. ==
 
     Returns
@@ -103,14 +103,14 @@ def match_keywords(ads, magazines):
 
     Parameters
     ----------
-    ads
+    ads: list[dict]
         input from json, list of dict
-    magazines
+    magazines: list[dict]
         input from json, list of dict
     Returns
     -------
     dict
-        dictionary with magazine ids as keys, and matched words with valuesZZ
+        dictionary with magazine ids as keys, and matched words as values
     """
     key_words = {}
     synset = {}
@@ -156,12 +156,13 @@ class AdMatch:
                                    "keywords": ["blancpain", "collection", "watch", "women", "wristwatch"],
                                    "page_number": 53}.. ]
                    }, ...] (magazine format example)}
-        top :
+        top : int
             butsaah top page iin too
 
         Returns
         -------
-
+        list
+            Predictions
         """
         ad = data['ad']
         magazines = data['magazines']

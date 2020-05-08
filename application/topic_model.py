@@ -180,9 +180,17 @@ class TopicModel:
     def topic_predict(self, bow_corpus, dictionary):
         """
 
-        @param bow_corpus: bag of words ( magazine )
-        @param dictionary: dictionary of magazine ( corpora object )
-        @return: predicted topics
+        Parameters
+        ----------
+        bow_corpus
+            bag of words ( magazine )
+        dictionary
+            dictionary of magazine ( corpora object )
+
+        Returns
+        -------
+        list
+            predicted topics
         """
         predicted = []
         for page in bow_corpus:
@@ -220,10 +228,19 @@ class TopicModel:
     def predict(self, clean_text, ner, page_numbers):
         """
 
-        @param clean_text: tokenized word list
-        @param ner: NER words of deeppavlov ( list )
-        @param page_numbers: page numbers list
-        @return: predicted topics json format
+        Parameters
+        ----------
+        clean_text
+            tokenized word list
+        ner
+            NER words of deeppavlov ( list )
+        page_numbers
+            page numbers list
+
+        Returns
+        -------
+        list
+            predicted topics json format
         """
         dictionary = corpora.Dictionary(clean_text)
         bow_corpus = [dictionary.doc2bow(doc) for doc in clean_text]

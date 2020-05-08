@@ -5,13 +5,21 @@ from nltk.corpus import wordnet
 
 
 def calculate_wup_score(word1, word2, synset, calculation_needed):
-    """
+    """Calculating similarity score between word1 and word2
 
-    @param word1:
-    @param word2:
-    @param synset:
-    @param calculation_needed:
-    @return:
+    Parameters
+    ----------
+    word1 : str
+    word2 : str
+    synset :dict
+        saves synonym set of nltk.wordnet to save time on multiple call
+    calculation_needed : bool
+        if false returns 0
+
+    Returns
+    -------
+    float
+        number between 0 and 1
     """
     if calculation_needed is False:
         return 0
@@ -41,8 +49,14 @@ def calculate_wup_score(word1, word2, synset, calculation_needed):
 def topic(ad):
     """
 
-    @param ad: ad data
-    @return: predicted topics of ad
+    Parameters
+    ----------
+    ad
+        ad data
+    Returns
+    -------
+    list
+        predicted topics of ad
     """
     ad_text = []
     ad_id = []
@@ -55,13 +69,23 @@ def topic(ad):
 
 
 def ad_compare(lis, ads, synset, calculate_word_similarity=True):
-    """
+    """Match similar words from list to ad's words
 
-    @param lis:
-    @param ads:
-    @param synset:
-    @param calculate_word_similarity:
-    @return:
+    Parameters
+    ----------
+    lis : list
+        list containing strings
+    ads : list
+        list containing ads
+    synset : dict
+        saves synonym set of nltk.wordnet to save time on multiple call
+    calculate_word_similarity : bool
+        false if words have to exact same. ==
+
+    Returns
+    -------
+    set
+        set with tuples of matched words. i.e. {(wordFromLis1, wordFromAds1),(wfl2,wfa2)}
     """
     result = {}
     for ad in ads:
@@ -75,11 +99,18 @@ def ad_compare(lis, ads, synset, calculate_word_similarity=True):
 
 
 def match_keywords(ads, magazines):
-    """
+    """match magazine keywords, and Named Entities with Ads description words
 
-    @param ads:
-    @param magazines:
-    @return:
+    Parameters
+    ----------
+    ads
+        input from json, list of dict
+    magazines
+        input from json, list of dict
+    Returns
+    -------
+    dict
+        dictionary with magazine ids as keys, and matched words with valuesZZ
     """
     key_words = {}
     synset = {}
@@ -107,7 +138,10 @@ class AdMatch:
     def predict(self, data, top):
         """
 
-        @param data: {
+        Parameters
+        ----------
+        data : dict
+            {
             "ad": [{ "id": 52,
                  "words": ["watch" , "collection" , "blancpain" , "wristwatch" , "women"] },
                  ....
@@ -122,8 +156,12 @@ class AdMatch:
                                    "keywords": ["blancpain", "collection", "watch", "women", "wristwatch"],
                                    "page_number": 53}.. ]
                    }, ...] (magazine format example)}
-        @param top: butsaah top page iin too
-        @return:
+        top :
+            butsaah top page iin too
+
+        Returns
+        -------
+
         """
         ad = data['ad']
         magazines = data['magazines']

@@ -12,10 +12,19 @@ wordnet_lemmatizer = WordNetLemmatizer()
 def topic_score(page, tdictionary, dictionary):
     """
 
-    @param page: text list of 1 page
-    @param tdictionary: topic dictionary from Tdictionary file
-    @param dictionary: dictionary of magazine
-    @return: topic tus buriin niit score, buh topic-n niilber onoo
+    Parameters
+    ----------
+    page :
+        text list of 1 page
+    tdictionary :
+        topic dictionary from Tdictionary file
+    dictionary :
+        dictionary of magazine
+
+    Returns
+    -------
+    int
+        topic tus buriin niit score, buh topic-n niilber onoo
     """
     total = 0
     t = {}  # topic buriin niit score
@@ -80,9 +89,17 @@ class AdTopicModel:
     def topic_predict(self, bow_corpus, dictionary):
         """
 
-        @param bow_corpus: bag of words (ad)
-        @param dictionary: dictionary of ad
-        @return: predicted topics of ad
+        Parameters
+        ----------
+        bow_corpus
+            bag of words (ad)
+        dictionary
+            dictionary of ad
+
+        Returns
+        -------
+        list
+            predicted topics of ad
         """
         predicted = []
         for page in bow_corpus:
@@ -111,9 +128,17 @@ class AdTopicModel:
     def predict(self, clean_text, ad_numbers):
         """
 
-        @param clean_text: tokenized word list
-        @param ad_numbers: id list of ad
-        @return: predicted topics of ad (json format)
+        Parameters
+        ----------
+        clean_text
+            tokenized word list
+        ad_numbers
+            id list of ad
+
+        Returns
+        -------
+        list
+            predicted topics of ad (json format)
         """
         dictionary = corpora.Dictionary(clean_text)
         bow_corpus = [dictionary.doc2bow(doc) for doc in clean_text]

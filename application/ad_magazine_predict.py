@@ -5,6 +5,14 @@ from nltk.corpus import wordnet
 
 
 def calculate_wup_score(word1, word2, synset, calculation_needed):
+    """
+
+    @param word1:
+    @param word2:
+    @param synset:
+    @param calculation_needed:
+    @return:
+    """
     if calculation_needed is False:
         return 0
     if word2 not in synset:
@@ -31,6 +39,11 @@ def calculate_wup_score(word1, word2, synset, calculation_needed):
 
 
 def topic(ad):
+    """
+
+    @param ad: ad data
+    @return: predicted topics of ad
+    """
     ad_text = []
     ad_id = []
     for temp in ad:
@@ -42,6 +55,14 @@ def topic(ad):
 
 
 def ad_compare(lis, ads, synset, calculate_word_similarity=True):
+    """
+
+    @param lis:
+    @param ads:
+    @param synset:
+    @param calculate_word_similarity:
+    @return:
+    """
     result = {}
     for ad in ads:
         result[str(ad['id'])] = set()
@@ -54,6 +75,12 @@ def ad_compare(lis, ads, synset, calculate_word_similarity=True):
 
 
 def match_keywords(ads, magazines):
+    """
+
+    @param ads:
+    @param magazines:
+    @return:
+    """
     key_words = {}
     synset = {}
     start_time = time.time()
@@ -79,7 +106,8 @@ class AdMatch:
 
     def predict(self, data, top):
         """
-            {
+
+        @param data: {
             "ad": [{ "id": 52,
                  "words": ["watch" , "collection" , "blancpain" , "wristwatch" , "women"] },
                  ....
@@ -94,6 +122,8 @@ class AdMatch:
                                    "keywords": ["blancpain", "collection", "watch", "women", "wristwatch"],
                                    "page_number": 53}.. ]
                    }, ...] (magazine format example)}
+        @param top: butsaah top page iin too
+        @return:
         """
         ad = data['ad']
         magazines = data['magazines']

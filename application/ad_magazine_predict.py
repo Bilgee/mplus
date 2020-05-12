@@ -1,10 +1,27 @@
 from application.ad_topic_model import AdTopicModel
 import time
+from log import logger
 
 from nltk.corpus import wordnet
 
 
 def calculate_wup_score(word1, word2, synset, calculation_needed):
+    """Calculating similarity score between word1 and word2
+
+    Parameters
+    ----------
+    word1: str
+    word2: str
+    synset: dict
+        saves synonym set of nltk.wordnet to save time on multiple call
+    calculation_needed: bool
+        if false returns 0
+
+    Returns
+    -------
+    float
+        number between 0 and 1
+    """
     if calculation_needed is False:
         return 0
     if word2 not in synset:
@@ -31,6 +48,17 @@ def calculate_wup_score(word1, word2, synset, calculation_needed):
 
 
 def topic(ad):
+    """
+
+    Parameters
+    ----------
+    ad : list
+        ad data
+    Returns
+    -------
+    list
+        predicted topics of ad
+    """
     ad_text = []
     ad_id = []
     for temp in ad:
@@ -42,6 +70,24 @@ def topic(ad):
 
 
 def ad_compare(lis, ads, synset, calculate_word_similarity=True):
+    """Match similar words from list to ad's words
+
+    Parameters
+    ----------
+    lis : list
+        list containing strings
+    ads : list
+        list containing ads
+    synset : dict
+        saves synonym set of nltk.wordnet to save time on multiple call
+    calculate_word_similarity : bool, optional
+        false if words have to exact same. ==
+
+    Returns
+    -------
+    set
+        set with tuples of matched words. i.e. {(wordFromLis1, wordFromAds1),(wfl2,wfa2)}
+    """
     result = {}
     for ad in ads:
         result[str(ad['id'])] = set()
@@ -54,6 +100,19 @@ def ad_compare(lis, ads, synset, calculate_word_similarity=True):
 
 
 def match_keywords(ads, magazines):
+    """match magazine keywords, and Named Entities with Ads description words
+
+    Parameters
+    ----------
+    ads: list[dict]
+        input from json, list of dict
+    magazines: list[dict]
+        input from json, list of dict
+    Returns
+    -------
+    dict
+        dictionary with magazine ids as keys, and matched words as values
+    """
     key_words = {}
     synset = {}
     start_time = time.time()
@@ -71,7 +130,7 @@ def match_keywords(ads, magazines):
             match = ad_compare(page_keywords, ads, synset, calculate_word_similarity=False)
             match1 = ad_compare(page_keywords1, ads, synset)
             key_words[str(magazine['id'])].append([match, match1])
-    print('\n\n---------- adCompare finished: took ', str(time.time() - start_time), ' seconds')
+    logger.info(f'adCompare finished: took {time.time() - start_time} seconds')
     return key_words
 
 
@@ -79,6 +138,10 @@ class AdMatch:
 
     def predict(self, data, top):
         """
+
+        Parameters
+        ----------
+        data : dict
             {
             "ad": [{ "id": 52,
                  "words": ["watch" , "collection" , "blancpain" , "wristwatch" , "women"] },
@@ -94,6 +157,13 @@ class AdMatch:
                                    "keywords": ["blancpain", "collection", "watch", "women", "wristwatch"],
                                    "page_number": 53}.. ]
                    }, ...] (magazine format example)}
+        top : int
+            butsaah top page iin too
+
+        Returns
+        -------
+        list
+            Predictions
         """
         ad = data['ad']
         magazines = data['magazines']
@@ -140,6 +210,8 @@ class AdMatch:
                     cnt += 1
                 match.sort(reverse=True)
                 for score, i, id2 in match[:top]:
+                    if score < 0.15:
+                        break
                     temp['ad_page_match'].append({"score": round(score, 5), "page_number": i, "magazine_id": id2})
                 temp3["ad_match"].append(temp)
             predict.append(temp3)

@@ -24,7 +24,23 @@ class TopicModel:
         with open("application/Tdictionary.txt") as json_file:
             self.Tdictionary = json.load(json_file)
 
-    def topics_words(self, index, number, model_topics):
+    @staticmethod
+    def topics_words(index, number, model_topics):
+        """
+
+        Parameters
+        ----------
+        index : int
+            topic index
+        number : int
+            butsaah ugiin too
+        model_topics : dict
+            topic word,category etc.. from Newtopic file
+        Returns
+        -------
+        list
+            list of topic words
+        """
         temp = []
         j = 0
         for word in model_topics['topics'][index]['words']:
@@ -35,11 +51,47 @@ class TopicModel:
             j += 1
         return temp
 
-    def topics_temp(self, category, score, total):
-        temp = {'category': category, 'score': round((score / total), 4)}
-        return temp
+    @staticmethod
+    def topics_temp(category, score, total):
+        """
 
-    def topic_score(self, page, tdictionary, dictionary):
+        Parameters
+        ----------
+        category : string
+            topic category
+        score : float
+            score of 1 topic
+        total : float
+            score of all topic
+
+        Returns
+        -------
+        dict
+            huwichilsan onoo
+        """
+        return {'category': category, 'score': round((score / total), 4)}
+
+    @staticmethod
+    def topic_score(page, tdictionary, dictionary):
+        """
+
+        Parameters
+        ----------
+        page : list
+            text list of 1 page
+        tdictionary : dict
+            topic dictionary from Tdictionary file
+        dictionary : object of gensim.corpora.dictionary
+            dictionary of magazine
+
+        Returns
+        -------
+        list
+            topic tus buriin niit score
+        float
+            buh topic-n niilber onoo
+
+        """
         total = 0
         t = {}  # topic buriin niit score
         for word in page:
@@ -87,10 +139,27 @@ class TopicModel:
         return t, total
 
     def max_score(self, temp, tlist, model_topics, total):
+        """Hamgiin ih onootoi 2 topiciin onoonii zuruu ih tohioldold top 2iig ene function-r songono.
+
+        Parameters
+        ----------
+        temp : list
+            top topics list
+        tlist : list
+            topics list(score,topic index,category)
+        model_topics : dict
+            topic word,category etc.. from Newtopic file
+        total : float
+            total score of all topics
+        Returns
+        -------
+        list
+            temp(top topics list)
+        """
         temp['topics'].append(self.topics_temp(tlist[-1][2], tlist[-1][0], total))
         temp['topics'][0]['words'] = self.topics_words(tlist[-1][1], 10, model_topics)
         temp['topics'][0]['index'] = tlist[-1][1]
-        if len(temp['topics']) > 1:
+        if len(tlist) > 1:
             temp['topics'].append(self.topics_temp(tlist[-2][2], tlist[-2][0], total))
             temp['topics'][1]['words'] = self.topics_words(tlist[-2][1], 10, model_topics)
             temp['topics'][1]['index'] = tlist[-2][1]
@@ -99,6 +168,23 @@ class TopicModel:
         return temp
 
     def max_category(self, temp, tlist, model_topics, total):
+        """Hamgiin ih onootoi 2 topiciin onoonii zuruu baga tohioldold top 2iig ene function-r songono.
+
+        Parameters
+        ----------
+        temp : list
+            top topics list
+        tlist : list
+            topics list(score,topic index,category)
+        model_topics : dict
+            topic word,category etc.. from Newtopic file
+        total : float
+            total score of all topics
+        Returns
+        -------
+        list
+            temp(top topics list)
+        """
         if not tlist[-2][2] == tlist[-3][2] or tlist[-3][0] + tlist[-2][0] < tlist[-1][0]:
             temp = self.max_score(temp, tlist, model_topics, total)
             return temp
@@ -135,6 +221,20 @@ class TopicModel:
         return temp
 
     def topic_predict(self, bow_corpus, dictionary):
+        """
+
+        Parameters
+        ----------
+        bow_corpus : list
+            bag of words ( magazine )
+        dictionary : object of gensim.corpora.dictionary
+            dictionary of magazine
+
+        Returns
+        -------
+        list
+            predicted topics
+        """
         predicted = []
         for page in bow_corpus:
             temp = {'topics': []}
@@ -169,6 +269,22 @@ class TopicModel:
         return predicted
 
     def predict(self, clean_text, ner, page_numbers):
+        """
+
+        Parameters
+        ----------
+        clean_text : list
+            tokenized word list
+        ner : list
+            NER words of deeppavlov
+        page_numbers : list
+            page numbers list
+
+        Returns
+        -------
+        list
+            predicted topics json format
+        """
         dictionary = corpora.Dictionary(clean_text)
         bow_corpus = [dictionary.doc2bow(doc) for doc in clean_text]
         topic_predictions = self.topic_predict(bow_corpus, dictionary)

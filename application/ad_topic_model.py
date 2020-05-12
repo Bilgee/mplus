@@ -6,17 +6,28 @@ from nltk.corpus import wordnet
 from nltk.stem import WordNetLemmatizer
 
 nltk.download('wordnet')
-
-
 wordnet_lemmatizer = WordNetLemmatizer()
 
 
-def topics_temp(category, score, total, index):
-    temp = {'category': category, 'score': round((score / total), 4), 'index': index}
-    return temp
-
-
 def topic_score(page, tdictionary, dictionary):
+    """
+
+    Parameters
+    ----------
+    page : list
+        text list of 1 page
+    tdictionary : dict
+        topic dictionary from Tdictionary file
+    dictionary : object of gensim.corpora.dictionary
+        dictionary of magazine
+
+    Returns
+    -------
+    list
+        topic tus buriin niit score
+    float
+        buh topic-n niilber onoo
+    """
     total = 0
     t = {}  # topic buriin niit score
     for word in page:
@@ -64,12 +75,6 @@ def topic_score(page, tdictionary, dictionary):
     return t, total
 
 
-def score(temp, tlist, total):
-    for t in tlist:
-        temp['topics'].append(topics_temp(t[2], t[0], total, t[1]))
-    return temp
-
-
 class AdTopicModel:
     def __init__(self):
         """init class object
@@ -84,6 +89,20 @@ class AdTopicModel:
             self.Tdictionary = json.load(json_file)
 
     def topic_predict(self, bow_corpus, dictionary):
+        """
+
+        Parameters
+        ----------
+        bow_corpus : list
+            bag of words (ad)
+        dictionary : object of gensim.corpora.dictionary
+            dictionary of ad
+
+        Returns
+        -------
+        list
+            predicted topics of ad
+        """
         predicted = []
         for page in bow_corpus:
             temp = {'topics': []}
@@ -103,11 +122,26 @@ class AdTopicModel:
                 temp['topics'].append(temp2)
                 predicted.append(temp)
                 continue
-            temp = score(temp, tlist, total)
+            for t in tlist:
+                temp['topics'].append({'category': t[2], 'score': round((t[0] / total), 4), 'index': t[1]})
             predicted.append(temp)
         return predicted
 
     def predict(self, clean_text, ad_numbers):
+        """
+
+        Parameters
+        ----------
+        clean_text : list
+            tokenized word list
+        ad_numbers : list
+            id list of ad
+
+        Returns
+        -------
+        list
+            predicted topics of ad (json format)
+        """
         dictionary = corpora.Dictionary(clean_text)
         bow_corpus = [dictionary.doc2bow(doc) for doc in clean_text]
         topic_predictions = self.topic_predict(bow_corpus, dictionary)

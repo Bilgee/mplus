@@ -1,5 +1,6 @@
 from application.ad_topic_model import AdTopicModel
 import time
+from log import logger
 
 from nltk.corpus import wordnet
 
@@ -129,7 +130,7 @@ def match_keywords(ads, magazines):
             match = ad_compare(page_keywords, ads, synset, calculate_word_similarity=False)
             match1 = ad_compare(page_keywords1, ads, synset)
             key_words[str(magazine['id'])].append([match, match1])
-    print('\n\n---------- adCompare finished: took ', str(time.time() - start_time), ' seconds')
+    logger.info(f'adCompare finished: took {time.time() - start_time} seconds')
     return key_words
 
 
@@ -209,6 +210,8 @@ class AdMatch:
                     cnt += 1
                 match.sort(reverse=True)
                 for score, i, id2 in match[:top]:
+                    if score < 0.15:
+                        break
                     temp['ad_page_match'].append({"score": round(score, 5), "page_number": i, "magazine_id": id2})
                 temp3["ad_match"].append(temp)
             predict.append(temp3)

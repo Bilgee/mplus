@@ -27,7 +27,7 @@ class AdAPI(Resource):
             if data is not None:
                 self.data['response']['code'] = 0
                 self.data['response']['text'] = self.ad_mag.predict(data, 10)
-            return self.data
         except Exception as e:
             logger.exception('ERROR', exc_info=e)
+        finally:
             return self.data

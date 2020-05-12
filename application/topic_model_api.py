@@ -32,7 +32,7 @@ class TopicModelAPI(Resource):
                 self.data['response']['code'] = 0
                 tokens, ner, page_numbers = self.ner_model.get_tokens_and_ner(data)
                 self.data['response']['text'] = self.topic_model.predict(tokens, ner, page_numbers)
-            return self.data
         except Exception as e:
             logger.exception('ERROR', exc_info=e)
+        finally:
             return self.data

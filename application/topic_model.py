@@ -159,7 +159,7 @@ class TopicModel:
         temp['topics'].append(self.topics_temp(tlist[-1][2], tlist[-1][0], total))
         temp['topics'][0]['words'] = self.topics_words(tlist[-1][1], 10, model_topics)
         temp['topics'][0]['index'] = tlist[-1][1]
-        if len(temp['topics']) > 1:
+        if len(tlist) > 1:
             temp['topics'].append(self.topics_temp(tlist[-2][2], tlist[-2][0], total))
             temp['topics'][1]['words'] = self.topics_words(tlist[-2][1], 10, model_topics)
             temp['topics'][1]['index'] = tlist[-2][1]

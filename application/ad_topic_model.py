@@ -39,8 +39,7 @@ class AdTopicModel:
         total = 0
         t = {}  # topic buriin niit score
         for word in page:
-            w = dictionary[word[0]]
-            ug = w.lower()
+            ug = dictionary[word[0]]
             s = {}
             if self.lang.get(ug):
                 syn = self.lang.get(ug)

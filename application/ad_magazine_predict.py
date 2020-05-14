@@ -64,7 +64,7 @@ def topic(ad):
     for temp in ad:
         ad_text.append(temp['words'])
         ad_id.append(temp['id'])
-    topic_model_ad = AdTopicModel()
+    topic_model_ad = AdTopicModel("en")
     ad_topic = topic_model_ad.predict(ad_text, ad_id)
     return ad_topic
 

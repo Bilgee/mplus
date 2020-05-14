@@ -18,7 +18,7 @@ print(abspath)
 # Flask app exporter
 app = Flask(__name__)
 api = Api(app)
-topic_model_en = TopicModel()
+topic_model_en = TopicModel("en")
 ad_mag = AdMatch()
 ner_model = Ner()
 

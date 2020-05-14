@@ -1,68 +1,68 @@
-import fnmatch
 import json
-import nltk
 from gensim import corpora
-from nltk.corpus import wordnet
-from nltk.stem import WordNetLemmatizer
-
-nltk.download('wordnet')
-wordnet_lemmatizer = WordNetLemmatizer()
 
 
-def topic_score(page, tdictionary, dictionary):
-    """
+class AdTopicModel:
+    def __init__(self, language):
+        """init class object
 
-    Parameters
-    ----------
-    page : list
-        text list of 1 page
-    tdictionary : dict
-        topic dictionary from Tdictionary file
-    dictionary : object of gensim.corpora.dictionary
-        dictionary of magazine
+        Arguments:
+            model -- [topics]
+            Tdictionary  -- [topic words dictionary]
+        """
+        with open("application/language/Sdictionary_"+language+".txt") as json_file:
+            self.lang = json.load(json_file)
+        with open("application/Newtopic.txt") as json_file:
+            self.model = json.load(json_file)
+        with open("application/Tdictionary.txt") as json_file:
+            self.Tdictionary = json.load(json_file)
 
-    Returns
-    -------
-    list
-        topic tus buriin niit score
-    float
-        buh topic-n niilber onoo
-    """
-    total = 0
-    t = {}  # topic buriin niit score
-    for word in page:
-        w = dictionary[word[0]]
-        w = wordnet_lemmatizer.lemmatize(w)
-        syns = wordnet.synsets(w)
-        dd = set()
-        if syns:
-            syn = syns[0]
-            if fnmatch.fnmatch(syn.name(), "*.n.*"):
-                for s in syn.lemmas():
-                    dd.add(s.name())
-        else:
-            dd.add(w)
-        s = {}
-        for ug in dd:
-            if tdictionary.get(ug):
-                temp2 = tdictionary.get(ug)
+    def topic_score(self, page, tdictionary, dictionary):
+        """
+
+        Parameters
+        ----------
+        page : list
+            text list of 1 page
+        tdictionary : dict
+            topic dictionary from Tdictionary file
+        dictionary : object of gensim.corpora.dictionary
+            dictionary of magazine
+
+        Returns
+        -------
+        list
+            topic tus buriin niit score
+        float
+            buh topic-n niilber onoo
+        """
+        total = 0
+        t = {}  # topic buriin niit score
+        for word in page:
+            w = dictionary[word[0]]
+            ug = w.lower()
+            s = {}
+            if self.lang.get(ug):
+                syn = self.lang.get(ug)
             else:
                 continue
+            temp2 = tdictionary.get(syn[0])
+            s = {}
             for q in temp2:
                 j = 1
                 i = 0
                 for p in range(word[1]):
-                    i += q['score'] * j
+                    i += q['score'] * syn[1] * j
                     j *= 0.9
                 if s.get(q['index']):
                     if i > s[q['index']][0]:
                         s[q['index']][0] = i
-                    if q['score'] > s[q['index']][1]:
-                        s[q['index']][1] = q['score']
+                    if q['score'] * syn[1] > s[q['index']][1]:
+                        s[q['index']][1] = q['score'] * syn[1]
                 else:
                     s[q['index']] = []
                     s[q['index']].append(i)
-                    s[q['index']].append(q['score'])
+                    s[q['index']].append(q['score'] * syn[1])
         for wo in s:
             total += s[wo][0]
             if t.get(wo):
@@ -72,21 +72,7 @@ def topic_score(page, tdictionary, dictionary):
                 t[wo] = []
                 t[wo].append(s[wo][0])
                 t[wo].append(s[wo][1])
-    return t, total
-
-
-class AdTopicModel:
-    def __init__(self):
-        """init class object
-
-        Arguments:
-            model -- [topics]
-            Tdictionary  -- [topic words dictionary]
-        """
-        with open("application/Newtopic.txt") as json_file:
-            self.model = json.load(json_file)
-        with open("application/Tdictionary.txt") as json_file:
-            self.Tdictionary = json.load(json_file)
+        return t, total
 
     def topic_predict(self, bow_corpus, dictionary):
         """
@@ -106,7 +92,7 @@ class AdTopicModel:
         predicted = []
         for page in bow_corpus:
             temp = {'topics': []}
-            t, total = topic_score(page, self.Tdictionary, dictionary)
+            t, total = self.topic_score(page, self.Tdictionary, dictionary)
             tlist = []
             for q in t:
                 temp2 = self.model['topics'][q]['category']  # q ni topiciin index

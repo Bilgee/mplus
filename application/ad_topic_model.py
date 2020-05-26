@@ -12,7 +12,7 @@ class AdTopicModel:
         """
         with open("application/language/Sdictionary_"+language+".txt") as json_file:
             self.lang = json.load(json_file)
-        with open("application/Newtopic.txt") as json_file:
+        with open("application/Newtopic_"+language+".txt") as json_file:
             self.model = json.load(json_file)
         with open("application/Tdictionary.txt") as json_file:
             self.Tdictionary = json.load(json_file)

@@ -40,6 +40,7 @@ class AdTopicModel:
         t = {}  # topic buriin niit score
         for word in page:
             ug = dictionary[word[0]]
+            ug = ug.lower()
             s = {}
             if self.lang.get(ug):
                 syn = self.lang.get(ug)
@@ -51,13 +52,14 @@ class AdTopicModel:
                 j = 1
                 i = 0
                 for p in range(word[1]):
-                    i += q['score'] * syn[1] * j
+                    i += q['score'] * j
                     j *= 0.9
+                i *= syn[1]
                 if s.get(q['index']):
                     if i > s[q['index']][0]:
                         s[q['index']][0] = i
                     if q['score'] * syn[1] > s[q['index']][1]:
-                        s[q['index']][1] = q['score'] * syn[1]
+                        s[q['index']][1] += q['score'] * syn[1]
                 else:
                     s[q['index']] = []
                     s[q['index']].append(i)

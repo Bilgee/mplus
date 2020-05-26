@@ -20,6 +20,7 @@ class TopicModelAPI(Resource):
         self.parser = reqparse.RequestParser()
         self.parser.add_argument(
             'data', type=list, location='json', required=True)
+        self.parser.add_argument('lang', type=str, location='json')
 
     def get(self):
         return "Send json with POST request to get it analyzed"
@@ -28,9 +29,10 @@ class TopicModelAPI(Resource):
         try:
             args = self.parser.parse_args()
             data = args["data"]
+            lang = args["lang"]
             if data is not None:
                 self.data['response']['code'] = 0
-                tokens, ner, page_numbers = self.ner_model.get_tokens_and_ner(data)
+                tokens, ner, page_numbers = self.ner_model.get_tokens_and_ner(data, lang)
                 self.data['response']['text'] = self.topic_model.predict(tokens, ner, page_numbers)
         except Exception as e:
             logger.exception('ERROR', exc_info=e)

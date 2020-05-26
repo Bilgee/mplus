@@ -86,11 +86,10 @@ class TopicModel:
 
         """
         total = 0
-        t = {}  # topic buriin niit score
+        s = {}  # topic buriin niit score
         for word in page:
             ug = dictionary[word[0]]
             ug = ug.lower()
-            s = {}
             if self.lang.get(ug):
                 syn = self.lang.get(ug)
             else:
@@ -104,24 +103,14 @@ class TopicModel:
                     j *= 0.9
                 i *= syn[1]
                 if s.get(q['index']):
-                    if i > s[q['index']][0]:
-                        s[q['index']][0] = i
+                    s[q['index']][0] += i
                     if q['score'] * syn[1] > s[q['index']][1]:
-                        s[q['index']][1] += q['score'] * syn[1]
+                        s[q['index']][1] = q['score'] * syn[1]
                 else:
                     s[q['index']] = []
                     s[q['index']].append(i)
                     s[q['index']].append(q['score'] * syn[1])
-            for wo in s:
-                total += s[wo][0]
-                if t.get(wo):
-                    t[wo][0] += s[wo][0]
-                    t[wo][1] += s[wo][1]
-                else:
-                    t[wo] = []
-                    t[wo].append(s[wo][0])
-                    t[wo].append(s[wo][1])
-        return t, total
+        return s, total
 
     def max_score(self, temp, tlist, model_topics, total):
         """Hamgiin ih onootoi 2 topiciin onoonii zuruu ih tohioldold top 2iig ene function-r songono.

@@ -37,17 +37,15 @@ class AdTopicModel:
             buh topic-n niilber onoo
         """
         total = 0
-        t = {}  # topic buriin niit score
+        s = {}  # topic buriin niit score
         for word in page:
             ug = dictionary[word[0]]
             ug = ug.lower()
-            s = {}
             if self.lang.get(ug):
                 syn = self.lang.get(ug)
             else:
                 continue
             temp2 = tdictionary.get(syn[0])
-            s = {}
             for q in temp2:
                 j = 1
                 i = 0
@@ -56,24 +54,15 @@ class AdTopicModel:
                     j *= 0.9
                 i *= syn[1]
                 if s.get(q['index']):
-                    if i > s[q['index']][0]:
-                        s[q['index']][0] = i
+                    s[q['index']][0] += i
                     if q['score'] * syn[1] > s[q['index']][1]:
-                        s[q['index']][1] += q['score'] * syn[1]
+                        s[q['index']][1] = q['score'] * syn[1]
                 else:
                     s[q['index']] = []
                     s[q['index']].append(i)
                     s[q['index']].append(q['score'] * syn[1])
-        for wo in s:
-            total += s[wo][0]
-            if t.get(wo):
-                t[wo][0] += s[wo][0]
-                t[wo][1] += s[wo][1]
-            else:
-                t[wo] = []
-                t[wo].append(s[wo][0])
-                t[wo].append(s[wo][1])
-        return t, total
+
+        return s, total
 
     def topic_predict(self, bow_corpus, dictionary):
         """

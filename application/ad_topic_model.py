@@ -61,7 +61,7 @@ class AdTopicModel:
                     s[q['index']] = []
                     s[q['index']].append(i)
                     s[q['index']].append(q['score'] * syn[1])
-            total += i
+                total += i
         return s, total
 
     def topic_predict(self, bow_corpus, dictionary):

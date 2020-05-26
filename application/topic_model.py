@@ -222,7 +222,7 @@ class TopicModel:
                 else:
                     total -= t[q][0]
             tlist.sort()
-            if total == 0 or len(tlist) == 0:
+            if total <= 0 or len(tlist) == 0:
                 temp2 = {'category': 'unknown', 'score': 0}
                 a = {"text": "", "score": 0}
                 temp2['words'] = [a]

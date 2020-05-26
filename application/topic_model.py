@@ -110,6 +110,7 @@ class TopicModel:
                     s[q['index']] = []
                     s[q['index']].append(i)
                     s[q['index']].append(q['score'] * syn[1])
+                total += i
         return s, total
 
     def max_score(self, temp, tlist, model_topics, total):

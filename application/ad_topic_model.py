@@ -118,12 +118,15 @@ class AdTopicModel:
             tokenized word list
         ad_numbers : list
             id list of ad
-
+        adlang : basestring
+            ad language
         Returns
         -------
         list
             predicted topics of ad (json format)
         """
+        if adlang is None:
+            adlang = "en"
         self.lang = self.langs[adlang]
         self.Tdictionary = self.Tdictionarys[adlang]
         dictionary = corpora.Dictionary(clean_text)

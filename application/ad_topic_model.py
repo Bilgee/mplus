@@ -3,19 +3,23 @@ from gensim import corpora
 
 
 class AdTopicModel:
-    def __init__(self, language):
+    def __init__(self):
         """init class object
 
         Arguments:
             model -- [topics]
             Tdictionary  -- [topic words dictionary]
         """
-        with open("application/language/Sdictionary_" + language + ".txt") as json_file:
-            self.lang = json.load(json_file)
         with open("application/Newtopic.txt") as json_file:
-            self.model = json.load(json_file)
-        with open("application/Tdictionary_" + language + ".txt") as json_file:
-            self.Tdictionary = json.load(json_file)
+            self.models = json.load(json_file)
+        self.languages = ["en", "ja"]
+        for language in self.languages:
+            with open("application/language/Sdictionary_" + language + ".txt") as json_file:
+                self.langs[language] = json.load(json_file)
+            with open("application/Tdictionary_" + language + ".txt") as json_file:
+                self.Tdictionarys[language] = json.load(json_file)
+        self.lang = self.langs["en"]
+        self.Tdictionary = self.Tdictionarys["en"]
 
     def topic_score(self, page, tdictionary, dictionary):
         """
@@ -103,7 +107,7 @@ class AdTopicModel:
             predicted.append(temp)
         return predicted
 
-    def predict(self, clean_text, ad_numbers):
+    def predict(self, clean_text, ad_numbers, adlang):
         """
 
         Parameters
@@ -118,13 +122,13 @@ class AdTopicModel:
         list
             predicted topics of ad (json format)
         """
+        self.lang = self.langs[adlang]
+        self.Tdictionary = self.Tdictionarys[adlang]
         dictionary = corpora.Dictionary(clean_text)
         bow_corpus = [dictionary.doc2bow(doc) for doc in clean_text]
         topic_predictions = self.topic_predict(bow_corpus, dictionary)
-        predicted = []
         cnt = 0
         for doc in topic_predictions:
             temp2 = {"topic": doc['topics'], "ad_number": ad_numbers[cnt]}
             cnt += 1
-            predicted.append(temp2)
-        return predicted
+            return temp2

@@ -18,12 +18,12 @@ print(abspath)
 # Flask app exporter
 app = Flask(__name__)
 api = Api(app)
-topic_model_en = TopicModel("en")
+topic_model = TopicModel()
 ad_mag = AdMatch()
 ner_model = Ner()
 
 api.add_resource(TopicModelAPI, '/v1.0/topicmodel/en',
-                 resource_class_kwargs={'topic_model': topic_model_en, 'ner_model': ner_model})
+                 resource_class_kwargs={'topic_model': topic_model, 'ner_model': ner_model})
 
 api.add_resource(AdAPI, '/v1.0/ad/en',
                  resource_class_kwargs={'ad_mag_predict': ad_mag})

@@ -34,8 +34,7 @@ class TopicModelAPI(Resource):
             if data is not None:
                 self.data['response']['code'] = 0
                 tokens, ner, page_numbers = self.ner_model.get_tokens_and_ner(data, lang)
-                self.topic_model = TopicModel(lang)
-                self.data['response']['text'] = self.topic_model.predict(tokens, ner, page_numbers)
+                self.data['response']['text'] = self.topic_model.predict(tokens, ner, page_numbers, lang)
         except Exception as e:
             logger.exception('ERROR', exc_info=e)
         finally:

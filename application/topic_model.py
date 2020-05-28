@@ -4,19 +4,23 @@ from gensim import corpora
 
 
 class TopicModel:
-    def __init__(self, language):
+    def __init__(self):
         """init class object
 
         Arguments:
             model -- [topics]
             Tdictionary  -- [Topic words dictionary]
         """
-        with open("application/language/Sdictionary_"+language+".txt") as json_file:
-            self.lang = json.load(json_file)
         with open("application/Newtopic.txt") as json_file:
-            self.model = json.load(json_file)
-        with open("application/Tdictionary_"+language+".txt") as json_file:
-            self.Tdictionary = json.load(json_file)
+            self.models = json.load(json_file)
+        self.languages = ["en", "ja"]
+        for language in self.languages:
+            with open("application/language/Sdictionary_" + language + ".txt") as json_file:
+                self.langs[language] = json.load(json_file)
+            with open("application/Tdictionary_" + language + ".txt") as json_file:
+                self.Tdictionarys[language] = json.load(json_file)
+        self.lang = self.langs["en"]
+        self.Tdictionary = self.Tdictionarys["en"]
 
     @staticmethod
     def topics_words(index, number, model_topics):

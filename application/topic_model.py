@@ -13,9 +13,9 @@ class TopicModel:
         """
         with open("application/language/Sdictionary_"+language+".txt") as json_file:
             self.lang = json.load(json_file)
-        with open("application/Newtopic_"+language+".txt") as json_file:
+        with open("application/Newtopic.txt") as json_file:
             self.model = json.load(json_file)
-        with open("application/Tdictionary.txt") as json_file:
+        with open("application/Tdictionary_"+language+".txt") as json_file:
             self.Tdictionary = json.load(json_file)
 
     @staticmethod
@@ -95,6 +95,8 @@ class TopicModel:
             else:
                 continue
             temp2 = tdictionary.get(syn[0])
+            if temp2 is None:
+                continue
             for q in temp2:
                 j = 1
                 i = 0

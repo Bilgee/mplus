@@ -1,14 +1,6 @@
-import fnmatch
 import json
 import gensim
-import nltk
 from gensim import corpora
-from nltk.corpus import wordnet
-from nltk.stem import WordNetLemmatizer
-
-nltk.download('wordnet')
-
-wordnet_lemmatizer = WordNetLemmatizer()
 
 
 class TopicModel:
@@ -21,8 +13,16 @@ class TopicModel:
         """
         with open("application/Newtopic.txt") as json_file:
             self.model = json.load(json_file)
-        with open("application/Tdictionary.txt") as json_file:
-            self.Tdictionary = json.load(json_file)
+        self.languages = ["en", "ja"]
+        self.langs = {}
+        self.Tdictionarys = {}
+        for language in self.languages:
+            with open("application/language/Sdictionary_" + language + ".txt") as json_file:
+                self.langs[language] = json.load(json_file)
+            with open("application/Tdictionary_" + language + ".txt") as json_file:
+                self.Tdictionarys[language] = json.load(json_file)
+        self.lang = self.langs["en"]
+        self.Tdictionary = self.Tdictionarys["en"]
 
     @staticmethod
     def topics_words(index, number, model_topics):
@@ -71,8 +71,7 @@ class TopicModel:
         """
         return {'category': category, 'score': round((score / total), 4)}
 
-    @staticmethod
-    def topic_score(page, tdictionary, dictionary):
+    def topic_score(self, page, tdictionary, dictionary):
         """
 
         Parameters
@@ -93,50 +92,34 @@ class TopicModel:
 
         """
         total = 0
-        t = {}  # topic buriin niit score
+        s = {}  # topic buriin niit score
         for word in page:
-            w = dictionary[word[0]]
-            w = wordnet_lemmatizer.lemmatize(w)
-            syns = wordnet.synsets(w)
-            dd = set()
-            if syns:
-                syn = syns[0]
-                if fnmatch.fnmatch(syn.name(), "*.n.*"):
-                    for s in syn.lemmas():
-                        dd.add(s.name())
+            ug = dictionary[word[0]]
+            ug = ug.lower()
+            if self.lang.get(ug):
+                syn = self.lang.get(ug)
             else:
-                dd.add(w)
-            s = {}
-            for ug in dd:
-                if tdictionary.get(ug):
-                    temp2 = tdictionary.get(ug)
+                continue
+            temp2 = tdictionary.get(syn[0])
+            if temp2 is None:
+                continue
+            for q in temp2:
+                j = 1
+                i = 0
+                for p in range(word[1]):
+                    i += q['score'] * j
+                    j *= 0.9
+                i *= syn[1]
+                if s.get(q['index']):
+                    s[q['index']][0] += i
+                    if q['score'] * syn[1] > s[q['index']][1]:
+                        s[q['index']][1] = q['score'] * syn[1]
                 else:
-                    continue
-                for q in temp2:
-                    j = 1
-                    i = 0
-                    for p in range(word[1]):
-                        i += q['score'] * j
-                        j *= 0.9
-                    if s.get(q['index']):
-                        if i > s[q['index']][0]:
-                            s[q['index']][0] = i
-                        if q['score'] > s[q['index']][1]:
-                            s[q['index']][1] = q['score']
-                    else:
-                        s[q['index']] = []
-                        s[q['index']].append(i)
-                        s[q['index']].append(q['score'])
-            for wo in s:
-                total += s[wo][0]
-                if t.get(wo):
-                    t[wo][0] += s[wo][0]
-                    t[wo][1] += s[wo][1]
-                else:
-                    t[wo] = []
-                    t[wo].append(s[wo][0])
-                    t[wo].append(s[wo][1])
-        return t, total
+                    s[q['index']] = []
+                    s[q['index']].append(i)
+                    s[q['index']].append(q['score'] * syn[1])
+                total += i
+        return s, total
 
     def max_score(self, temp, tlist, model_topics, total):
         """Hamgiin ih onootoi 2 topiciin onoonii zuruu ih tohioldold top 2iig ene function-r songono.
@@ -247,7 +230,7 @@ class TopicModel:
                 else:
                     total -= t[q][0]
             tlist.sort()
-            if total == 0 or len(tlist) == 0:
+            if total <= 0 or len(tlist) == 0:
                 temp2 = {'category': 'unknown', 'score': 0}
                 a = {"text": "", "score": 0}
                 temp2['words'] = [a]

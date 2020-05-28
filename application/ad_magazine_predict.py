@@ -61,11 +61,12 @@ def topic(ad):
     """
     ad_text = []
     ad_id = []
+    ad_topic = []
+    topic_model_ad = AdTopicModel()
     for temp in ad:
         ad_text.append(temp['words'])
         ad_id.append(temp['id'])
-    topic_model_ad = AdTopicModel()
-    ad_topic = topic_model_ad.predict(ad_text, ad_id)
+        ad_topic.append(topic_model_ad.predict(ad_text, ad_id, temp.get("lang")))
     return ad_topic
 
 

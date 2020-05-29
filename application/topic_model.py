@@ -15,11 +15,11 @@ class TopicModel:
         self.langs = {}
         self.Tdictionarys = {}
         for language in self.languages:
-            with open("application/Newtopic_" + language + ".txt") as json_file:
+            with open("application/language/Newtopic_" + language + ".txt") as json_file:
                 self.models[language] = json.load(json_file)
             with open("application/language/Sdictionary_" + language + ".txt") as json_file:
                 self.langs[language] = json.load(json_file)
-            with open("application/Tdictionary_" + language + ".txt") as json_file:
+            with open("application/language/Tdictionary_" + language + ".txt") as json_file:
                 self.Tdictionarys[language] = json.load(json_file)
         self.lang = self.langs["en"]
         self.Tdictionary = self.Tdictionarys["en"]

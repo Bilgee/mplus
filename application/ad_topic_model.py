@@ -10,18 +10,19 @@ class AdTopicModel:
             model -- [topics]
             Tdictionary  -- [topic words dictionary]
         """
-        with open("application/Newtopic.txt") as json_file:
-            self.model = json.load(json_file)
         self.languages = ["en", "ja"]
         self.langs = {}
         self.Tdictionarys = {}
         for language in self.languages:
+            with open("application/Newtopic_" + language + ".txt") as json_file:
+                self.models[language] = json.load(json_file)
             with open("application/language/Sdictionary_" + language + ".txt") as json_file:
                 self.langs[language] = json.load(json_file)
             with open("application/Tdictionary_" + language + ".txt") as json_file:
                 self.Tdictionarys[language] = json.load(json_file)
         self.lang = self.langs["en"]
         self.Tdictionary = self.Tdictionarys["en"]
+        self.model = self.models["en"]
 
     def topic_score(self, page, tdictionary, dictionary):
         """
@@ -129,6 +130,7 @@ class AdTopicModel:
             adlang = "en"
         self.lang = self.langs[adlang]
         self.Tdictionary = self.Tdictionarys[adlang]
+        self.model = self.models[adlang]
         dictionary = corpora.Dictionary(clean_text)
         bow_corpus = [dictionary.doc2bow(doc) for doc in clean_text]
         topic_predictions = self.topic_predict(bow_corpus, dictionary)

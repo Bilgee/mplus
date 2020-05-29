@@ -251,7 +251,7 @@ class TopicModel:
                 continue
         return predicted
 
-    def predict(self, clean_text, ner, page_numbers):
+    def predict(self, clean_text, ner, page_numbers, maglang):
         """
 
         Parameters
@@ -262,12 +262,17 @@ class TopicModel:
             NER words of deeppavlov
         page_numbers : list
             page numbers list
-
+        maglang : basestring
+            magazine language
         Returns
         -------
         list
             predicted topics json format
         """
+        if maglang is None:
+            maglang = "en"
+        self.lang = self.langs[maglang]
+        self.Tdictionary = self.Tdictionarys[maglang]
         dictionary = corpora.Dictionary(clean_text)
         bow_corpus = [dictionary.doc2bow(doc) for doc in clean_text]
         topic_predictions = self.topic_predict(bow_corpus, dictionary)

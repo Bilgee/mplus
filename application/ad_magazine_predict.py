@@ -141,6 +141,7 @@ class AdMatch:
         data : dict
             {
             "ad": [{ "id": 52,
+                 "lang" : "en"
                  "words": ["watch" , "collection" , "blancpain" , "wristwatch" , "women"] },
                  ....
                ] (advertisement format example),

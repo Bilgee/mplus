@@ -100,7 +100,7 @@ class AdTopicModel:
             if total == 0 or len(tlist) == 0:
                 temp2 = {'category': 'unknown', 'score': 0}
                 a = {"text": "", "score": 0}
-                temp2['Words'] = [a]
+                temp2['words'] = [a]
                 temp['topics'].append(temp2)
                 predicted.append(temp)
                 continue

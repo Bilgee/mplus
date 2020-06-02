@@ -13,6 +13,7 @@ class AdTopicModel:
         self.languages = ["en", "ja"]
         self.langs = {}
         self.Tdictionarys = {}
+        self.models = {}
         for language in self.languages:
             with open("application/language/Newtopic_" + language + ".txt") as json_file:
                 self.models[language] = json.load(json_file)
@@ -110,14 +111,14 @@ class AdTopicModel:
             predicted.append(temp)
         return predicted
 
-    def predict(self, clean_text, ad_numbers, adlang):
+    def predict(self, clean_text, ad_number, adlang):
         """
 
         Parameters
         ----------
         clean_text : list
             tokenized word list
-        ad_numbers : list
+        ad_number : list
             id list of ad
         adlang : basestring
             ad language
@@ -136,6 +137,6 @@ class AdTopicModel:
         topic_predictions = self.topic_predict(bow_corpus, dictionary)
         cnt = 0
         for doc in topic_predictions:
-            temp2 = {"topic": doc['topics'], "ad_number": ad_numbers[cnt]}
+            temp2 = {"topic": doc['topics'], "ad_number": ad_number}
             cnt += 1
             return temp2

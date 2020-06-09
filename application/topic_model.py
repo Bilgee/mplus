@@ -11,7 +11,7 @@ class TopicModel:
             model -- [topics]
             Tdictionary  -- [Topic words dictionary]
         """
-        self.languages = ["en", "ja", "mn", "zh-cn"]
+        self.languages = ["en", "ja", "mn", "zh-cn", "id"]
         self.langs = {}
         self.Tdictionarys = {}
         self.models = {}
@@ -273,6 +273,7 @@ class TopicModel:
         """
         if maglang is None:
             maglang = "en"
+        maglang = maglang.lower()
         self.lang = self.langs[maglang]
         self.Tdictionary = self.Tdictionarys[maglang]
         self.model = self.models[maglang]

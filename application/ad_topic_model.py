@@ -10,7 +10,7 @@ class AdTopicModel:
             model -- [topics]
             Tdictionary  -- [topic words dictionary]
         """
-        self.languages = ["en", "ja", "mn", "zh-cn"]
+        self.languages = ["en", "ja", "mn", "zh-cn", "id"]
         self.langs = {}
         self.Tdictionarys = {}
         self.models = {}
@@ -129,6 +129,7 @@ class AdTopicModel:
         """
         if adlang is None:
             adlang = "en"
+        adlang = adlang.lower()
         self.lang = self.langs[adlang]
         self.Tdictionary = self.Tdictionarys[adlang]
         self.model = self.models[adlang]

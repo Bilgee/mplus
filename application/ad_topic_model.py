@@ -132,6 +132,8 @@ class AdTopicModel:
             adlang = "en"
         try:
             adlang = adlang.lower()
+            if adlang is 'zh':
+                adlang = 'zh-cn'
             self.lang = self.langs[adlang]
             self.Tdictionary = self.Tdictionarys[adlang]
             self.model = self.models[adlang]

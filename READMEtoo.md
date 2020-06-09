@@ -4,7 +4,7 @@
 > /v1.0/topicmodel/en   ## used for english magazines 
 ## Available languages
 
-available languages for topic extraction: English (en)
+available languages for topic extraction: English (en), Japanese (ja), Chinese Simplified (zh or zh-cn), Chinese Traditional (zh-tw), Russian (ru), Indonesian (id), Malay (ms), Mongolian (mn)
 
 available languages for NER: [102 languages](https://github.com/google-research/bert/blob/master/multilingual.md#list-of-languages) (bert multilingual)
 

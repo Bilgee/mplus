@@ -1,5 +1,6 @@
 import json
 from gensim import corpora
+from log import logger
 
 
 class AdTopicModel:
@@ -129,10 +130,14 @@ class AdTopicModel:
         """
         if adlang is None:
             adlang = "en"
-        adlang = adlang.lower()
-        self.lang = self.langs[adlang]
-        self.Tdictionary = self.Tdictionarys[adlang]
-        self.model = self.models[adlang]
+        try:
+            adlang = adlang.lower()
+            self.lang = self.langs[adlang]
+            self.Tdictionary = self.Tdictionarys[adlang]
+            self.model = self.models[adlang]
+        except KeyError as e:
+            logger.exception('ERROR', exc_info=e)
+            print("Send json with POST request to get it analyzed")
         dictionary = corpora.Dictionary(clean_text)
         bow_corpus = [dictionary.doc2bow(doc) for doc in clean_text]
         topic_predictions = self.topic_predict(bow_corpus, dictionary)

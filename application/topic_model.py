@@ -1,6 +1,7 @@
 import json
 import gensim
 from gensim import corpora
+from log import logger
 
 
 class TopicModel:
@@ -273,10 +274,14 @@ class TopicModel:
         """
         if maglang is None:
             maglang = "en"
-        maglang = maglang.lower()
-        self.lang = self.langs[maglang]
-        self.Tdictionary = self.Tdictionarys[maglang]
-        self.model = self.models[maglang]
+        try:
+            maglang = maglang.lower()
+            self.lang = self.langs[maglang]
+            self.Tdictionary = self.Tdictionarys[maglang]
+            self.model = self.models[maglang]
+        except KeyError as e:
+            logger.exception('ERROR', exc_info=e)
+            print("Send json with POST request to get it analyzed")
         dictionary = corpora.Dictionary(clean_text)
         bow_corpus = [dictionary.doc2bow(doc) for doc in clean_text]
         topic_predictions = self.topic_predict(bow_corpus, dictionary)

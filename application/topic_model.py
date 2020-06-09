@@ -12,7 +12,7 @@ class TopicModel:
             model -- [topics]
             Tdictionary  -- [Topic words dictionary]
         """
-        self.languages = ["en", "ja", "mn", "zh-cn", "id"]
+        self.languages = ["en", "ja", "mn", "zh-cn", "id", "ru", "zh-tw", "ms"]
         self.langs = {}
         self.Tdictionarys = {}
         self.models = {}

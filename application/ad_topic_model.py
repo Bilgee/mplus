@@ -11,7 +11,7 @@ class AdTopicModel:
             model -- [topics]
             Tdictionary  -- [topic words dictionary]
         """
-        self.languages = ["en", "ja", "mn", "zh-cn", "id"]
+        self.languages = ["en", "ja", "mn", "zh-cn", "id", "ru", "zh-tw", "ms"]
         self.langs = {}
         self.Tdictionarys = {}
         self.models = {}

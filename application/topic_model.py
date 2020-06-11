@@ -276,6 +276,8 @@ class TopicModel:
             maglang = "en"
         try:
             maglang = maglang.lower()
+            if maglang is 'zh':
+                maglang = 'zh-cn'
             self.lang = self.langs[maglang]
             self.Tdictionary = self.Tdictionarys[maglang]
             self.model = self.models[maglang]
